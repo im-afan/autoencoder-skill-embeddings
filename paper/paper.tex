@@ -1,0 +1,20 @@
+\documentclass[a4paper]{article}
+\begin{document}
+\large 
+A Brief Overview of the Actor-Critic Method\linebreak
+\normalsize
+A policy $\pi_\theta(A|S)$ gives the probability of taking action A given S.\linebreak
+The goal then is to maximze the objective function 
+$$C_{t_0}(\theta) = E[\sum_{t=t_0}^{\infty} \log(\pi_\theta(a_t|s_t)) * r(a_t|s_t)],$$
+where $r(A|S)$ represents the reward from taking action A at state S. We then define 
+$$Q(a_t|s_t) = C_{t}(\theta|a_t),$$
+representing the q-value. The q-value of taking an action $A$ at state $S$ is equal to the expected sum of the discounted rewards, 
+given that the action taken at time $t$ is $a_t$.
+We now define two agents: an actor, $\pi_\theta(A|S)$, which predicts the probability of taking action $A$ at state $S$, and critic $q_\theta(a_t|s_t)$,
+which predics the value of $Q(a_t|s_t)$. Now, as the actor trains on the environment, the critic can be optimized by looking at the actor's total reward after an episode,
+and the actor is able to learn using the critic's predicted q-values. [TODO MAKE MORE DETAILED]\linebreak
+\large
+Title about my algorithm
+\normalsize
+The objective is to have an agent $\pi_\theta(A|S)$ pre
+\end{document}
