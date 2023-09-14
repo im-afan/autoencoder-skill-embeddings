@@ -13,8 +13,14 @@ given that the action taken at time $t$ is $a_t$.
 We now define two agents: an actor, $\pi_\theta(A|S)$, which predicts the probability of taking action $A$ at state $S$, and critic $q_\theta(a_t|s_t)$,
 which predics the value of $Q(a_t|s_t)$. Now, as the actor trains on the environment, the critic can be optimized by looking at the actor's total reward after an episode,
 and the actor is able to learn using the critic's predicted q-values. [TODO MAKE MORE DETAILED]\linebreak
+
 \large
 Title about my algorithm
 \normalsize
-The objective is to have an agent $\pi_\theta(A|S)$ pre
+
+The agent will be trained on low-level, general tasks, such as walking forward and turning.
+After these low-level skills have been developed, we can map movements into a latent space using an autoencoder
+then, another agent will be able to learn to perform specific tasks using generalized skills by 
+predicting actions on the latent space instead of raw movements.
+
 \end{document}
