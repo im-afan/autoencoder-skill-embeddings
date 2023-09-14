@@ -8,7 +8,6 @@ import numpy as np
 from PIL import Image
 
 import gym
-import roboschool
 
 from PPO import PPO
 
@@ -95,7 +94,7 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_st
 
 		for t in range(1, max_ep_len+1):
 		    action = ppo_agent.select_action(state)
-		    state, reward, done, _ = env.step(action)
+		    state, reward, done, _, _ = env.step(action)
 		    ep_reward += reward
 
 		    img = env.render(mode = 'rgb_array')
@@ -200,7 +199,7 @@ if __name__ == '__main__':
 	# max_ep_len = 1000           # max timesteps in one episode
 	# action_std = 0.1            # set same std for action distribution which was used while saving
 
-	env_name = "RoboschoolHalfCheetah-v1"
+	env_name = "Walker2d-v4"
 	has_continuous_action_space = True
 	max_ep_len = 1000           # max timesteps in one episode
 	action_std = 0.1            # set same std for action distribution which was used while saving
