@@ -1,14 +1,14 @@
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import project_config
 
 def save_graph():
     print("============================================================================================")
     # env_name = 'CartPole-v1'
     # env_name = 'LunarLander-v2'
     # env_name = 'BipedalWalker-v2'
-    env_name = 'Walker2d-v4'
+    env_name = project_config.ENV_NAME
 
     fig_num = 0     #### change this to prevent overwriting figures in same env_name folder
     plot_avg = True    # plot average of all runs; else plot all runs separately
