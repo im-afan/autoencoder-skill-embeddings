@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-import train_ppo, test_ppo 
+import train_ppo, test_ppo, train_autoencoder
 import movement_autoencoder
 import gym
 import project_config
@@ -32,4 +32,10 @@ def main():
         action_dim = env.action_space.shape[0]
     else:
         action_dim = env.action_space.n
+
+    train_ppo.train()
+    train_autoencoder.train()
+
+if(__name__ == "__main__"):
+    main()
 

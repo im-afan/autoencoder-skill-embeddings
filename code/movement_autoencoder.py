@@ -32,6 +32,10 @@ class Autoencoder(nn.Module):
         self.encoder = Encoder(action_size, latent_size, hidden_size=hidden_size)
         self.decoder = Encoder(action_size, latent_size, hidden_size=hidden_size)
 
+    def save(self, checkpoint_path="Autoencoder_pretrained/"):
+        torch.save(self.encoder.state_dict(), self.checkpoint_path + "encoder.pth")
+        torch.save(self.decoder.state_dict(), self.checkpoint_path + "decoder.pth")
+
     def forward(self, state_orig, state_end):
         latent = self.encoder(state_orig, state_end)
         return self.decoder(state_orig, latent)

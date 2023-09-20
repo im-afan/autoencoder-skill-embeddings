@@ -9,5 +9,5 @@ class LoggedState:
 
 logged_states = []
 
-def log_state(self, orig_state, end_state, episode):
+def log_state(orig_state, end_state, episode):
     logged_states.append(LoggedState(orig_state, end_state, episode))
