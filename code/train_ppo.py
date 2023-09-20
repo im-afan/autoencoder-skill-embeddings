@@ -1,6 +1,8 @@
 import project_config
+import logger
 
 import os
+import copy
 import glob
 import time
 from datetime import datetime
@@ -176,7 +178,12 @@ def train():
 
             # select action with policy
             action = ppo_agent.select_action(state)
+
+            prev_state = copy.deepcopy(state)
             state, reward, done, _, _ = env.step(action)
+            cur_state = copy.deepcopy(state)
+
+            logger.log_state(prev_state, cur_state, time_step) #log states for autoencoder
 
             # saving reward and is_terminals
             ppo_agent.buffer.rewards.append(reward)
