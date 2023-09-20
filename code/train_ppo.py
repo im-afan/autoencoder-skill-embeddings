@@ -25,11 +25,11 @@ def train():
     has_continuous_action_space = True  # continuous action space; else discrete
 
     max_ep_len = 1000                   # max timesteps in one episode
-    max_training_timesteps = int(1000)   # break training loop if timeteps > max_training_timesteps
+    max_training_timesteps = int(10000)   # break training loop if timeteps > max_training_timesteps
 
-    print_freq = max_ep_len * 10        # print avg reward in the interval (in num timesteps)
+    print_freq = 100      # print avg reward in the interval (in num timesteps)
     log_freq = max_ep_len * 2           # log avg reward in the interval (in num timesteps)
-    save_model_freq = int(100)          # save model frequency (in num timesteps)
+    save_model_freq = int(1000)          # save model frequency (in num timesteps)
 
     action_std = 0.6                    # starting std for action distribution (Multivariate Normal)
     action_std_decay_rate = 0.05        # linearly decay action_std (action_std = action_std - action_std_decay_rate)
@@ -183,7 +183,7 @@ def train():
             state, reward, done, _, _ = env.step(action)
             cur_state = copy.deepcopy(state)
 
-            logger.log_state(prev_state, cur_state, time_step) #log states for autoencoder
+            logger.log_state(prev_state, cur_state, action, time_step) #log states for autoencoder
 
             # saving reward and is_terminals
             ppo_agent.buffer.rewards.append(reward)
