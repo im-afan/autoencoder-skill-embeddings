@@ -36,14 +36,13 @@ class MovementDataset(Dataset):
 
 ################################### Training ###################################
 def train():
-    ###################################  ###################################
     epochs = 10
     env_name = project_config.ENV_NAME
     has_continuous_action_space = True;
     env = gym.make(env_name)
     checkpoint_path = "./autoencoder_pretrained/"
 
-    print_freq = 100                # print frequenecy (loss, etc)
+    print_freq = 1000                # print frequenecy (loss, etc)
     save_model_freq = 1000          # save model frequency (in num timesteps)
     start_time = datetime.now()
 
@@ -78,7 +77,7 @@ def train():
 
             optimizer.step()
             if(batch_index % print_freq == print_freq-1):
-                print("epoch: {}, batch index: {}, loss: {}".format(epoch, batch_index, running_loss))
+                print("epoch : {}, batch index : {}, loss : {}".format(epoch, batch_index, running_loss))
                 running_loss = 0
         # save model
         print("--------------------------SAVING MODEL-------------------------")

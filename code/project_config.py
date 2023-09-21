@@ -1,1 +1,1 @@
-ENV_NAME = "Humanoid-v4"
+ENV_NAME = "Walker2d"

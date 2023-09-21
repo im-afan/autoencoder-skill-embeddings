@@ -25,7 +25,7 @@ def train():
     has_continuous_action_space = True  # continuous action space; else discrete
 
     max_ep_len = 1000                   # max timesteps in one episode
-    max_training_timesteps = int(1e5)   # break training loop if timeteps > max_training_timesteps
+    max_training_timesteps = int(2e6)   # break training loop if timeteps > max_training_timesteps
 
     print_freq = int(1e3)      # print avg reward in the interval (in num timesteps)
     log_freq = max_ep_len * 2           # log avg reward in the interval (in num timesteps)
@@ -249,6 +249,8 @@ def train():
     log_f.close()
     env.close()
 
+    logger.write_logs_to_file()
+
     # print total training time
     print("============================================================================================")
     end_time = datetime.now().replace(microsecond=0)
@@ -259,12 +261,4 @@ def train():
 
 
 if __name__ == '__main__':
-
     train()
-    
-    
-    
-    
-    
-    
-    
