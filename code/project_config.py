@@ -1,1 +1,1 @@
-ENV_NAME = "Walker2d"
+ENV_NAME = "Ant-v4"
