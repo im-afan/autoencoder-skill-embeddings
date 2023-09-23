@@ -6,10 +6,16 @@ from gymnasium.spaces import Box
 
 class CustomAntEnv(ant_v4.AntEnv):
     def __init__(self, *args, **kwargs):
+        self.cur_frames = 0
         super().__init__(*args, **kwargs)
 
+    def step(self, *args, **kwargs):
+        obs, reward, done, _, info = super().step(*args, **kwargs)
+        self.cur_frames += 1
+        done = done or self.cur_frames > 1000
+        return obs, reward, done, _, info
     def reset(self, *args, **kwargs): 
-        #print(super().reset(*args, **kwargs))
+        self.cur_frames = 0
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
 

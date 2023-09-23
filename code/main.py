@@ -10,14 +10,16 @@ from custom_envs.ant_turn import CustomAntEnv
 def main():
     ####### initialize environment hyperparameters ######
     env_name = project_config.ENV_NAME 
+    sample_render_timesteps = 1000
     sample_timesteps_per_agent = 10000
-    agent_train_timesteps = 1000
-    agent_log_timesteps = 10
-    agent_save_timestes = 10
+    agent_train_timesteps = 100000
+    agent_log_timesteps = 1
+    agent_save_timestes = 1
 
     has_continuous_action_space = True  # continuous action space; else discrete
  
-    env = gym.make(env_name)
+    #env = gym.make(env_name, render_mode="rgb_array", reset_noise_scale=0.1)
+    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
 
     state_dim = env.observation_space.shape[0]
 
@@ -27,14 +29,14 @@ def main():
     else:
         action_dim = env.action_space.n
 
-    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.5, terminate_when_unhealthy=True)
     agent_lowlevel = Agent(env)
     agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timestes
     )
-    agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=True)
+    agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
+    agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")
     train_autoencoder.train(env)
 

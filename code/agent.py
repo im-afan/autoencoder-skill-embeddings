@@ -1,5 +1,3 @@
-
-
 import torch
 import numpy as np
 import gymnasium as gym
@@ -28,16 +26,23 @@ class Agent:
         self.save_path = save_path 
 
     def train(self, total_timesteps, log_interval, save_timesteps):
-        print(self.policy)
+        print("======= BEGIN TRAINING AGENT =======")
         self.policy.save(self.save_path)
-        for i in range(total_timesteps//save_timesteps):
-            self.policy.load(self.save_path)
+        """for i in range(total_timesteps//save_timesteps):
+            print(" asdfasdfadf ")
+            #self.policy.load(self.save_path)
             self.policy.learn(
                 total_timesteps=save_timesteps, 
                 log_interval=log_interval
             )
             print("========== SAVING AGENT =========")
-            self.policy.save(self.save_path)
+            #self.policy.save(self.save_path)"""
+        self.policy.learn(
+            total_timesteps=total_timesteps,
+            log_interval=log_interval,
+            progress_bar=True
+        )
+        print("======= TRAINING AGENT FINISHED =======")
     
     def sample_movement(self, total_timesteps, render=False):
         print("====== sample movement =======")
@@ -55,6 +60,7 @@ class Agent:
             if(render):
                 vec_env.render("human")
             if(done):
+                print("FINISHED AAAAAASD F")
                 vec_env.reset()
 
             cur_timesteps += 1
