@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import train_lowlevel, train_autoencoder
 import movement_autoencoder
-import gym
+import gymnasium as gym
 import project_config
 from agent import Agent
 from custom_envs.ant_turn import CustomAntEnv

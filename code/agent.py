@@ -44,7 +44,9 @@ class Agent:
         while cur_timesteps < total_timesteps:
             action, _ = self.policy.predict(obs)
             prev_obs = deepcopy(obs)
-            obs, _, done, _ = vec_env.step(action)
+            print(action)
+            #print(type(vec_env.step(action)))
+            obs, _, done, _, _ = vec_env.step(action)
             logger.log_state(prev_obs, obs, action, cur_timesteps)
 
             if(render):
