@@ -13,7 +13,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 
-import gym
+import gymnasium as gym
 #import roboschool
 
 from movement_autoencoder import Autoencoder

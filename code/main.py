@@ -10,7 +10,7 @@ from custom_envs.ant_turn import CustomAntEnv
 def main():
     ####### initialize environment hyperparameters ######
     env_name = project_config.ENV_NAME 
-    sample_timesteps_per_agent = 1000
+    sample_timesteps_per_agent = 10000
     agent_train_timesteps = 1000
     agent_log_timesteps = 10
     agent_save_timestes = 10
@@ -27,13 +27,13 @@ def main():
     else:
         action_dim = env.action_space.n
 
-    env = CustomAntEnv(render_mode="rgb_array")
+    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.5, terminate_when_unhealthy=True)
     agent_lowlevel = Agent(env)
-    """agent_lowlevel.train(
+    agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timestes
-    )"""
+    )
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=True)
     print("==== finished sampling data ====")
     train_autoencoder.train(env)

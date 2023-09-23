@@ -10,6 +10,8 @@ from copy import deepcopy
 import project_config
 import logger
 
+import time
+
 class Agent:
     def __init__(self, env, save_path="./sb3_pretrained"):
         self.env = env
@@ -40,7 +42,8 @@ class Agent:
     def sample_movement(self, total_timesteps, render=False):
         print("====== sample movement =======")
         cur_timesteps = 0
-        vec_env = self.policy.get_env()
+        vec_env = self.policy.get_env() 
+        #print(vec_env)
         obs = vec_env.reset()
         while cur_timesteps < total_timesteps:
             action, _ = self.policy.predict(obs)
@@ -55,6 +58,7 @@ class Agent:
                 vec_env.reset()
 
             cur_timesteps += 1
+            #time.sleep(0.5)
         print("======= finished sampling, writing to file =========")
         logger.write_logs_to_file()
         
