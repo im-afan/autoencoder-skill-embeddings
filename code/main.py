@@ -6,13 +6,14 @@ import gymnasium as gym
 import project_config
 from agent import Agent
 from custom_envs.ant_turn import CustomAntEnv
+from custom_envs.ant_highlevel import HighLevelEnvWrapper
 
 def main():
     ####### initialize environment hyperparameters ######
     env_name = project_config.ENV_NAME 
     sample_render_timesteps = 1000
     sample_timesteps_per_agent = 10000
-    agent_train_timesteps = 100000
+    agent_train_timesteps = 1000
     agent_log_timesteps = 1
     agent_save_timestes = 1
 
@@ -38,7 +39,13 @@ def main():
     agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")
-    train_autoencoder.train(env)
+    #autoencoder = train_autoencoder.train(env)
+    autoencoder_trainer = train_autoencoder.AutoencoderWrapper(env)
+    autoencoder_trainer.train()
+    autoencoder = autoencoder_trainer.autoencoder
+
+    high_level_env = HighLevelEnvWrapper(env, autoencoder, project_config.AUTOENCODER_LATENT_SIZE)
+    
 
 if(__name__ == "__main__"):
     main()

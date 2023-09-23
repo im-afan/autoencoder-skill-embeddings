@@ -21,7 +21,8 @@ class Agent:
         self.policy = sb3.TD3(
             "MlpPolicy",
             self.env,
-            action_noise=self.action_noise
+            action_noise=self.action_noise,
+            device="cuda" if torch.cuda.is_available() else "cpu"
         )
         self.save_path = save_path 
 

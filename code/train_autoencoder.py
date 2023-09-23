@@ -1,5 +1,6 @@
 import project_config
 import logger
+from custom_envs.ant_turn import CustomAntEnv
 
 import os
 import copy
@@ -33,59 +34,56 @@ class MovementDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
-################################### Training ###################################
-def train(env):
-    epochs = 10
-    #env_name = project_config.ENV_NAME
-    has_continuous_action_space = True;
-    #env = gym.make(env_name)
-    checkpoint_path = "./autoencoder_pretrained/"
+ 
+class AutoencoderWrapper:
+    def __init__(
+            self,
+            env,
+            checkpoint_path="./autoencoder_pretrained",
+            print_freq=10,
+        ):
+        self.checkpoint_path = checkpoint_path
+        self.print_freq = print_freq
+        self.dataset = MovementDataset(logger.logged_states)
 
-    print_freq = 10                # print frequenecy (loss, etc)
-    save_model_freq = 1000          # save model frequency (in num timesteps)
-    start_time = datetime.now()
-
-
-    # state space dimension
-    state_dim = env.observation_space.shape[0]
-
-    # action space dimension
-    if has_continuous_action_space:
+        state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
-    else:
-        action_dim = env.action_space.n
+        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE)
+    
+    def train(self, epochs=10):
+        optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
+        loss_fn = nn.MSELoss()
+        running_loss = 0
+        start_time = datetime.now()
+        loader = DataLoader(self.dataset, batch_size=16)
 
-    autoencoder = Autoencoder(state_dim, action_dim, 8)
-    dataset = MovementDataset(logger.logged_states)
-    loader = DataLoader(dataset, batch_size=16)
+        for epoch in range(epochs):
+            for batch_index, (begin_state, end_state, action) in enumerate(loader):
+                #print("index: {}, orig: {}, end: {}".format(batch_index, begin_state.shape, end_state.shape))
+                optimizer.zero_grad()
 
-    optimizer = Adam(autoencoder.parameters(), lr=0.001)
-    loss_fn = nn.MSELoss()
-    running_loss = 0
+                output = self.autoencoder(begin_state, action)
 
-    for epoch in range(epochs):
-        for batch_index, (begin_state, end_state, action) in enumerate(loader):
-            #print("index: {}, orig: {}, end: {}".format(batch_index, begin_state.shape, end_state.shape))
-            optimizer.zero_grad()
+                loss = loss_fn(output, action)
+                loss.backward()
+                running_loss += loss.item()
 
-            output = autoencoder(begin_state, action)
+                optimizer.step()
+                if(batch_index % self.print_freq == self.print_freq-1):
+                    print("epoch : {}, batch index : {}, loss : {}".format(epoch, batch_index, running_loss))
+                    running_loss = 0
+            # save model
+            print("--------------------------SAVING MODEL-------------------------")
+            print("saving encoder model at: " + self.checkpoint_path + "encoder.pth")
+            print("saving decoder model at: " + self.checkpoint_path + "decoder.pth")
+            self.autoencoder.save(self.checkpoint_path + "encoder.pth")
+            print("save successful")
+            print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
+            print("---------------------------------------------------------------")
 
-            loss = loss_fn(output, action)
-            loss.backward()
-            running_loss += loss.item()
-
-            optimizer.step()
-            if(batch_index % print_freq == print_freq-1):
-                print("epoch : {}, batch index : {}, loss : {}".format(epoch, batch_index, running_loss))
-                running_loss = 0
-        # save model
-        print("--------------------------SAVING MODEL-------------------------")
-        print("saving encoder model at: " + checkpoint_path + "encoder.pth")
-        print("saving decoder model at: " + checkpoint_path + "decoder.pth")
-        autoencoder.save(checkpoint_path + "encoder.pth")
-        print("save successful")
-        print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
-        print("---------------------------------------------------------------")
+    def test(self, timesteps=1000):
+        pass
 
 if __name__ == '__main__':
-    train()
+    autoencoder_trainer = AutoencoderWrapper(CustomAntEnv())
+    autoencoder_trainer.train()
