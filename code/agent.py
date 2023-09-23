@@ -38,15 +38,15 @@ class Agent:
             self.policy.save(self.save_path)
     
     def sample_movement(self, total_timesteps, render=False):
+        print("====== sample movement =======")
         cur_timesteps = 0
         vec_env = self.policy.get_env()
         obs = vec_env.reset()
         while cur_timesteps < total_timesteps:
             action, _ = self.policy.predict(obs)
             prev_obs = deepcopy(obs)
-            print(action)
             #print(type(vec_env.step(action)))
-            obs, _, done, _, _ = vec_env.step(action)
+            obs, _, done, _ = vec_env.step(action)
             logger.log_state(prev_obs, obs, action, cur_timesteps)
 
             if(render):
@@ -55,5 +55,6 @@ class Agent:
                 vec_env.reset()
 
             cur_timesteps += 1
+        print("======= finished sampling, writing to file =========")
         logger.write_logs_to_file()
         

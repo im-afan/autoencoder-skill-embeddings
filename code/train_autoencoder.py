@@ -34,14 +34,14 @@ class MovementDataset(Dataset):
         return len(self.data)
 
 ################################### Training ###################################
-def train():
+def train(env):
     epochs = 10
-    env_name = project_config.ENV_NAME
+    #env_name = project_config.ENV_NAME
     has_continuous_action_space = True;
-    env = gym.make(env_name)
+    #env = gym.make(env_name)
     checkpoint_path = "./autoencoder_pretrained/"
 
-    print_freq = 1000                # print frequenecy (loss, etc)
+    print_freq = 10                # print frequenecy (loss, etc)
     save_model_freq = 1000          # save model frequency (in num timesteps)
     start_time = datetime.now()
 
