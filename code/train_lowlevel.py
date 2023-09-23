@@ -27,7 +27,10 @@ def train():
     observation_dim = env.observation_space.shape[0]
     
     agent = Agent(env)
-    agent.policy.load("./sb3_pretrained.zip")
+    try:
+        agent.policy.load("./sb3_pretrained.zip")
+    except: 
+        pass
     agent.train(1000, 10, 10)
 
 def sample_data():

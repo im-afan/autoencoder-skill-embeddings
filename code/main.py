@@ -5,6 +5,7 @@ import movement_autoencoder
 import gym
 import project_config
 from agent import Agent
+from custom_envs.ant_turn import CustomAntEnv
 
 def main():
     ####### initialize environment hyperparameters ######
@@ -26,12 +27,13 @@ def main():
     else:
         action_dim = env.action_space.n
 
+    env = CustomAntEnv()
     agent_lowlevel = Agent(env)
-    agent_lowlevel.train(
+    """agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timestes
-    )
+    )"""
     agent_lowlevel.sample_movement(sample_timesteps_per_agent)
     train_lowlevel.sample_data()
     train_autoencoder.train()
