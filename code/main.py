@@ -6,13 +6,13 @@ import gymnasium as gym
 import project_config
 from agent import Agent
 from custom_envs.ant_turn import CustomAntEnv
-from custom_envs.ant_highlevel import HighLevelEnvWrapper
+from custom_envs.ant_highlevel import HighLevelAntEnv 
 
 def main():
     ####### initialize environment hyperparameters ######
     env_name = project_config.ENV_NAME 
     sample_render_timesteps = 1000
-    sample_timesteps_per_agent = 10000
+    sample_timesteps_per_agent = 1000
     agent_train_timesteps = 1000
     agent_log_timesteps = 1
     agent_save_timestes = 1
@@ -31,21 +31,21 @@ def main():
         action_dim = env.action_space.n
 
     agent_lowlevel = Agent(env)
-    agent_lowlevel.train(
+    """agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timestes
-    )
-    agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
+    )"""
+    #agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")
-    #autoencoder = train_autoencoder.train(env)
     autoencoder_trainer = train_autoencoder.AutoencoderWrapper(env)
     autoencoder_trainer.train()
-    autoencoder = autoencoder_trainer.autoencoder
+    autoencoder = autoencoder_trainer.autoencoder.decoder
 
-    high_level_env = HighLevelEnvWrapper(env, autoencoder, project_config.AUTOENCODER_LATENT_SIZE)
-    
+    high_level_env = HighLevelAntEnv(autoencoder, project_config.AUTOENCODER_LATENT_SIZE, render_mode="rgb_array")
+    agent_highlevel = Agent(high_level_env)
+    agent_highlevel.sample_movement(sample_timesteps_per_agent, render=True)
 
 if(__name__ == "__main__"):
     main()
