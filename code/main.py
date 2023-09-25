@@ -12,10 +12,10 @@ def main():
     ####### initialize environment hyperparameters ######
     env_name = project_config.ENV_NAME 
     sample_render_timesteps = 1000
-    sample_timesteps_per_agent = 1000
-    agent_train_timesteps = 1000
-    agent_log_timesteps = 1
-    agent_save_timestes = 1
+    sample_timesteps_per_agent = 100000
+    agent_train_timesteps = int(2e6)
+    agent_log_timesteps = 100
+    agent_save_timesteps = 1
 
     has_continuous_action_space = True  # continuous action space; else discrete
  
@@ -30,12 +30,12 @@ def main():
     else:
         action_dim = env.action_space.n
 
-    agent_lowlevel = Agent(env)
-    """agent_lowlevel.train(
+    agent_lowlevel = Agent(env, save_path="./sb3_pretrained/low_level")
+    agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
-        agent_save_timestes
-    )"""
+        agent_save_timesteps
+    )
     #agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")
@@ -44,8 +44,13 @@ def main():
     autoencoder = autoencoder_trainer.autoencoder.decoder
 
     high_level_env = HighLevelAntEnv(autoencoder, project_config.AUTOENCODER_LATENT_SIZE, render_mode="rgb_array")
-    agent_highlevel = Agent(high_level_env)
-    agent_highlevel.sample_movement(sample_timesteps_per_agent, render=True)
+    agent_highlevel = Agent(high_level_env, save_path="./sb3_pretrained/high_level")
+    agent_highlevel.train(
+        agent_train_timesteps,
+        agent_log_timesteps,
+        agent_save_timesteps
+    )
+    #agent_highlevel.sample_movement(sample_timesteps_per_agent, render=True)
 
 if(__name__ == "__main__"):
     main()

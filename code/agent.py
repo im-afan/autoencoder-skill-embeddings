@@ -1,3 +1,5 @@
+
+
 import torch
 import numpy as np
 import gymnasium as gym
@@ -28,7 +30,6 @@ class Agent:
 
     def train(self, total_timesteps, log_interval, save_timesteps):
         print("======= BEGIN TRAINING AGENT =======")
-        self.policy.save(self.save_path)
         """for i in range(total_timesteps//save_timesteps):
             print(" asdfasdfadf ")
             #self.policy.load(self.save_path)
@@ -43,6 +44,7 @@ class Agent:
             log_interval=log_interval,
             progress_bar=True
         )
+        self.policy.save(self.save_path)
         print("======= TRAINING AGENT FINISHED =======")
     
     def sample_movement(self, total_timesteps, render=False):
