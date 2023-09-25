@@ -73,9 +73,8 @@
     </body>
 
     <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
-    <body name="obstacle" pos="5 0 1">
+    <body name="obstacle" pos="1.9 0 1">
       <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/> 
-      <joint type="free"/>
       <geom type="box" size="1 1 1" rgba="0 .9 0 1"/>
     </body>
 

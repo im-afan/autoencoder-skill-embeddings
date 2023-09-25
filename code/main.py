@@ -7,6 +7,7 @@ import project_config
 from agent import Agent
 from custom_envs.ant_turn import CustomAntEnv
 from custom_envs.ant_highlevel import HighLevelAntEnv 
+from custom_envs.ant_obstacle import AntObstacleEnv
 
 def main():
     ####### initialize environment hyperparameters ######
@@ -19,8 +20,15 @@ def main():
 
     has_continuous_action_space = True  # continuous action space; else discrete
  
-    #env = gym.make(env_name, render_mode="rgb_array", reset_noise_scale=0.1)
-    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    """env = gym.make(
+        env_name, 
+        render_mode="rgb_array", 
+        reset_noise_scale=0.1,
+        #xml_file="~/Documents/code/projects/unsupervised-skill-embeddings/code/custom_envs/assets/ant_obstacle.xml",
+    )"""
+    #env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    env = AntObstacleEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    env.reset()
 
     state_dim = env.observation_space.shape[0]
 
@@ -31,12 +39,12 @@ def main():
         action_dim = env.action_space.n
 
     agent_lowlevel = Agent(env, save_path="./sb3_pretrained/low_level")
-    agent_lowlevel.train(
+    """agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timesteps
-    )
-    #agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
+    )"""
+    agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")
     autoencoder_trainer = train_autoencoder.AutoencoderWrapper(env)
