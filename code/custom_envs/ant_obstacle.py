@@ -37,7 +37,7 @@ class AntObstacleEnv(MujocoEnv, utils.EzPickle):
         healthy_z_range=(0.2, 1.0),
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0,
-        exclude_current_positions_from_observation=True,
+        exclude_current_positions_from_observation=False,
         **kwargs,
     ):
         #xml_file = "ant.xml"
@@ -55,6 +55,8 @@ class AntObstacleEnv(MujocoEnv, utils.EzPickle):
             exclude_current_positions_from_observation,
             **kwargs,
         )
+
+        self.target_position = np.array([10, 0])
 
         self._ctrl_cost_weight = ctrl_cost_weight
         self._contact_cost_weight = contact_cost_weight
@@ -136,11 +138,14 @@ class AntObstacleEnv(MujocoEnv, utils.EzPickle):
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
+        x_position, y_position = xy_position_after
 
         forward_reward = x_velocity
         healthy_reward = self.healthy_reward
+        diff_vector = xy_position_after - self.target_position
+        distance_reward = -np.linalg.norm(diff_vector)/np.linalg.norm(self.target_position)
 
-        rewards = forward_reward + healthy_reward
+        rewards = forward_reward + healthy_reward + distance_reward
 
         costs = ctrl_cost = self.control_cost(action)
 
@@ -150,6 +155,7 @@ class AntObstacleEnv(MujocoEnv, utils.EzPickle):
             "reward_forward": forward_reward,
             "reward_ctrl": -ctrl_cost,
             "reward_survive": healthy_reward,
+            "reward_distance": distance_reward,
             "x_position": xy_position_after[0],
             "y_position": xy_position_after[1],
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
@@ -157,6 +163,7 @@ class AntObstacleEnv(MujocoEnv, utils.EzPickle):
             "y_velocity": y_velocity,
             "forward_reward": forward_reward,
         }
+        print(info)
         if self._use_contact_forces:
             contact_cost = self.contact_cost
             costs += contact_cost
