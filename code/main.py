@@ -14,7 +14,7 @@ def main():
     env_name = project_config.ENV_NAME 
     sample_render_timesteps = 1000
     sample_timesteps_per_agent = 100000
-    agent_train_timesteps = int(2e6)
+    agent_train_timesteps = int(1e6)
     agent_log_timesteps = 100
     agent_save_timesteps = 1
 
@@ -26,24 +26,24 @@ def main():
         reset_noise_scale=0.1,
         #xml_file="~/Documents/code/projects/unsupervised-skill-embeddings/code/custom_envs/assets/ant_obstacle.xml",
     )"""
-    #env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
-    env = AntObstacleEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
-    env.reset()
+    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    #env = AntObstacleEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    #env = gym.make("LunarLanderContinuous-v2", render_mode="rgb_array")
 
     state_dim = env.observation_space.shape[0]
-
     # action space dimension
     if has_continuous_action_space:
         action_dim = env.action_space.shape[0]
     else:
         action_dim = env.action_space.n
 
-    agent_lowlevel = Agent(env, save_path="./sb3_pretrained/low_level")
-    """agent_lowlevel.train(
+    agent_lowlevel = Agent(env, save_path="./sb3_pretrained/low_level1")
+    agent_lowlevel.train(
         agent_train_timesteps,
         agent_log_timesteps,
         agent_save_timesteps
-    )"""
+    )
+    #agent_lowlevel.policy.load("./sb3_pretrained/low_level.zip")
     agent_lowlevel.sample_movement(sample_render_timesteps, render=True)
     agent_lowlevel.sample_movement(sample_timesteps_per_agent, render=False)
     print("==== finished sampling data ====")

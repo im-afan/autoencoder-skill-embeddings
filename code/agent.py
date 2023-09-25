@@ -24,6 +24,7 @@ class Agent:
             "MlpPolicy",
             self.env,
             action_noise=self.action_noise,
+            verbose=1,
             device="cuda" if torch.cuda.is_available() else "cpu"
         )
         self.save_path = save_path 
@@ -41,7 +42,6 @@ class Agent:
             #self.policy.save(self.save_path)"""
         self.policy.learn(
             total_timesteps=total_timesteps,
-            log_interval=log_interval,
             progress_bar=True
         )
         self.policy.save(self.save_path)

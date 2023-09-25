@@ -16,25 +16,29 @@ import gymnasium as gym
 import stable_baselines3
 from stable_baselines3.common.noise import NormalActionNoise
 
+from custom_envs.ant_turn import CustomAntEnv
+
 from agent import Agent
 
-env = gym.make(project_config.ENV_NAME, render_mode="rgb_array", terminate_when_unhealthy=True)
-agent = Agent(env)
-
 ################################### Training ###################################
-def train():
-    action_dim = env.action_space.shape[0]
-    observation_dim = env.observation_space.shape[0]
-    
-    agent = Agent(env)
-    try:
-        agent.policy.load("./sb3_pretrained.zip")
-    except: 
-        pass
-    agent.train(1000, 10, 10)
+def train(agent):
+    sample_render_timesteps = 1000
+    sample_timesteps_per_agent = 100000
+    agent_train_timesteps = int(1e6)
+    agent_log_timesteps = 100
+    agent_save_timesteps = 1
 
-def sample_data():
+    agent_lowlevel = Agent(env, save_path="./sb3_pretrained/low_level1")
+    agent_lowlevel.train(
+        agent_train_timesteps,
+        agent_log_timesteps,
+        agent_save_timesteps
+    )
+
+def sample_data(agent):
     agent.sample_movement(int(1000), render=True)
 
 if __name__ == '__main__':
-    train()
+    env = CustomAntEnv(render_mode="rgb_array")
+    agent = Agent(env, save_path="./sb3_pretrained/lowlevel1")
+    train(agent)
