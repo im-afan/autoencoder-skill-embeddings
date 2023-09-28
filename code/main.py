@@ -5,7 +5,7 @@ import movement_autoencoder
 import gymnasium as gym
 import project_config
 from agent import Agent
-from custom_envs.ant_turn import CustomAntEnv
+from custom_envs.ant_turn import AntTargetPosEnv 
 from custom_envs.ant_highlevel import HighLevelAntEnv 
 from custom_envs.ant_obstacle import AntObstacleEnv
 
@@ -26,7 +26,7 @@ def main():
         reset_noise_scale=0.1,
         #xml_file="~/Documents/code/projects/unsupervised-skill-embeddings/code/custom_envs/assets/ant_obstacle.xml",
     )"""
-    env = CustomAntEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
+    env = AntTargetPosEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
     #env = AntObstacleEnv(render_mode="rgb_array", reset_noise_scale=0.1, terminate_when_unhealthy=True)
     #env = gym.make("LunarLanderContinuous-v2", render_mode="rgb_array")
 

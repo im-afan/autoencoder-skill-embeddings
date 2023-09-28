@@ -15,8 +15,10 @@ import gymnasium as gym
 
 import stable_baselines3
 from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3 import TD3
 
-from custom_envs.ant_turn import CustomAntEnv
+from custom_envs.ant_turn1 import CustomAntEnv
+from custom_envs.ant_turn import AntTargetPosEnv 
 
 from agent import Agent
 
@@ -39,6 +41,30 @@ def sample_data(agent):
     agent.sample_movement(int(1000), render=True)
 
 if __name__ == '__main__':
-    env = CustomAntEnv(render_mode="rgb_array")
+    env = gym.make("Ant-v4", render_mode="rgb_array", use_contact_forces=True)
+    #env = AntTargetPosEnv(render_mode="rgb_array", use_contact_forces=True)
     agent = Agent(env, save_path="./sb3_pretrained/lowlevel1")
     train(agent)
+    #sample_data(agent)
+
+    #env = gym.make("Ant-v4", render_mode="rgb_array")
+    """env = CustomAntEnv(render_mode="rgb_array", terminate_when_unhealthy=True, use_contact_forces=True)
+    agent1 = TD3.load("./sb3_pretrained/Ant-v3.zip", env=env)
+    print(agent1)
+    vec_env = agent1.get_env() 
+    print(vec_env)
+    obs = vec_env.reset()
+    cur_timesteps = 0
+    total_timesteps = 1000
+    while cur_timesteps < total_timesteps:
+        action, _ = agent1.predict(obs)
+        #print(type(vec_env.step(action)))
+        obs, _, done, _ = vec_env.step(action)
+
+        vec_env.render("human")
+        if(done):
+            print("FINISHED AAAAAASD F")
+            vec_env.reset()
+
+        cur_timesteps += 1
+        #time.sleep(0.5)"""

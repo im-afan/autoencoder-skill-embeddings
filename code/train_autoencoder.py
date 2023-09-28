@@ -1,6 +1,6 @@
 import project_config
 import logger
-from custom_envs.ant_turn import CustomAntEnv
+from custom_envs.ant_turn1 import CustomAntEnv
 
 import os
 import copy
