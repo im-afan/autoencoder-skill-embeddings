@@ -16,6 +16,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.stateId = -1
     self.target_dist = target_dist
     self.target = 0
+    self.cur_time = 0;
     MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="rgb_array")
 
 
@@ -28,6 +29,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
 
 
   def reset(self, **kwargs):
+    self.cur_time = 0
     angle = np.random.uniform(0, np.pi)
     self.walk_target_x = np.cos(angle) * self.target_dist
     self.walk_target_y = np.sin(angle) * self.target_dist
@@ -55,7 +57,8 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     return r
 
   def _isDone(self):
-    return self._alive < 0
+    
+    return self._alive < 0 or self.cur_time > 1000
 
   def move_robot(self, init_x, init_y, init_z):
     "Used by multiplayer stadium to move sideways, to another running lane."
@@ -74,6 +77,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
 
   def step(self, a):
     #print("step step step")
+    self.cur_time += 1
     if not self.scene.multiplayer:  # if multiplayer, action first applied to all robots, then global step() called, then _step() for all robots with the same actions
       self.robot.apply_action(a)
       self.scene.global_step()
