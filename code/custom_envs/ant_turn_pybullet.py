@@ -8,7 +8,7 @@ from pybullet_envs_gymnasium.gym_locomotion_envs import WalkerBaseBulletEnv
 
 class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10 lines to the original impl lol
 
-  def __init__(self, robot : WalkerBase, render=False, target_dist=1e3):
+  def __init__(self, robot : WalkerBase, render=False, target_dist=1e3, **kwargs):
     # print("WalkerBase::__init__ start")
     self.camera_x = 0
     self.walk_target_x = target_dist  # kilometer away
@@ -16,7 +16,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.stateId = -1
     self.target_dist = target_dist
     self.target = 0
-    MJCFBaseBulletEnv.__init__(self, robot, render)
+    MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="rgb_array")
 
 
   def create_single_player_scene(self, bullet_client):
@@ -144,9 +144,9 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.camera.move_and_look_at(self.camera_x, y , 1.4, x, y, 1.0)
 
 class AntTargetPosBulletEnv(WalkerTargetPosBulletEnv):
-  def __init__(self, render=False):
+  def __init__(self, render=False, **kwargs):
     self.robot = Ant()
-    WalkerTargetPosBulletEnv.__init__(self, self.robot, render)
+    WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
 
 if __name__ == "__main__":
   print(AntTargetPosBulletEnv().reset())
