@@ -6,6 +6,7 @@ from pybullet_envs_gymnasium.scene_stadium import SinglePlayerStadiumScene
 from pybullet_envs_gymnasium.robot_locomotors import Ant, WalkerBase
 from pybullet_envs_gymnasium.gym_locomotion_envs import WalkerBaseBulletEnv
 import project_config
+from logger import log_state
 import time
 
 class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10 lines to the original impl lol
@@ -20,7 +21,10 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.target = 0
     self.cur_time = 0
     self.is_rendering = render
-    self.logging = kwargs["logging"]
+    try:
+      self.logging = kwargs["logging"]
+    except:
+      self.logging = False
     MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="human")
 
 
@@ -84,11 +88,16 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.cur_time += 1
     #print(self.cur_time)
     #print("step step step")
+    orig_state = self.robot.calc_state()
+
     if not self.scene.multiplayer:  # if multiplayer, action first applied to all robots, then global step() called, then _step() for all robots with the same actions
       self.robot.apply_action(a)
       self.scene.global_step()
 
     state = self.robot.calc_state()  # also calculates self.joints_at_limit
+
+    if(self.logging):
+      log_state(orig_state, state, a, self.cur_time)
 
     self._alive = float(
         self.robot.alive_bonus(

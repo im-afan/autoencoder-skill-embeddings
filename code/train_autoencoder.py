@@ -1,6 +1,6 @@
 import project_config
 import logger
-from custom_envs.ant_turn import CustomAntEnv
+from custom_envs.ant_turn_pybullet import AntTargetPosBulletEnv
 
 import os
 import copy
@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 
 import gymnasium as gym
-#import roboschool
+import pandas as pd
 
 from movement_autoencoder import Autoencoder
 
@@ -44,7 +44,15 @@ class AutoencoderWrapper:
         ):
         self.checkpoint_path = checkpoint_path
         self.print_freq = print_freq
-        self.dataset = MovementDataset(logger.logged_states)
+        if(len(logger.logged_states)):
+            self.dataset = MovementDataset(logger.logged_states)
+        else:
+            logged_orig_states = np.load("./logged_states/logged_orig_states.npy")
+            logged_end_states = np.load("./logged_states/logged_end_states.npy")
+            logged_actions = np.load("./logged_states/logged_actions.npy")
+            for i in range(len(logged_orig_states)):
+                logger.log_state(logged_orig_states[i], logged_end_states[i], logged_actions[i], 0)
+            self.dataset = MovementDataset(logger.logged_states)
 
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
@@ -85,5 +93,5 @@ class AutoencoderWrapper:
         pass
 
 if __name__ == '__main__':
-    autoencoder_trainer = AutoencoderWrapper(CustomAntEnv())
+    autoencoder_trainer = AutoencoderWrapper(AntTargetPosBulletEnv())
     autoencoder_trainer.train()

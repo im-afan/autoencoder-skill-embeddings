@@ -153,8 +153,8 @@ def enjoy() -> None:  # noqa: C901
     # overwrite with command line arguments
     if args.env_kwargs is not None:
         env_kwargs.update(args.env_kwargs)
-    env_kwargs["logging"] = False
-    env_kwargs["render"] = True
+    env_kwargs["logging"] = True 
+    env_kwargs["render"] = False 
 
     log_dir = args.reward_log if args.reward_log != "" else None
 
