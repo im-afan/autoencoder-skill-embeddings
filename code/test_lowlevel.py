@@ -1,5 +1,6 @@
 import sys
-from rl_zoo3.enjoy import enjoy
+#from rl_zoo3.enjoy import enjoy
+from custom_enjoy import enjoy
 import gymnasium as gym
 from custom_envs.ant_turn_pybullet import AntTargetPosBulletEnv
 

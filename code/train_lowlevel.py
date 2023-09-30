@@ -7,7 +7,8 @@ gym.register(
     id="AntTargetPosBulletEnv-v0",
     entry_point=AntTargetPosBulletEnv
 )
-sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosBulletEnv-v0", "--eval-freq", "100"]
+sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosBulletEnv-v0", "--eval-freq", "100000", "-P"]
+#sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0", "--eval-freq", "1000", "-P"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
 
 train()

@@ -5,6 +5,8 @@ from pybullet_envs_gymnasium.env_bases import MJCFBaseBulletEnv
 from pybullet_envs_gymnasium.scene_stadium import SinglePlayerStadiumScene
 from pybullet_envs_gymnasium.robot_locomotors import Ant, WalkerBase
 from pybullet_envs_gymnasium.gym_locomotion_envs import WalkerBaseBulletEnv
+import project_config
+import time
 
 class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10 lines to the original impl lol
 
@@ -16,7 +18,10 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     self.stateId = -1
     self.target_dist = target_dist
     self.target = 0
-    MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="rgb_array")
+    self.cur_time = 0
+    self.is_rendering = render
+    self.logging = kwargs["logging"]
+    MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="human")
 
 
   def create_single_player_scene(self, bullet_client):
@@ -28,6 +33,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
 
 
   def reset(self, **kwargs):
+    self.cur_time = 0
     angle = np.random.uniform(0, np.pi)
     self.walk_target_x = np.cos(angle) * self.target_dist
     self.walk_target_y = np.sin(angle) * self.target_dist
@@ -55,7 +61,7 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
     return r
 
   def _isDone(self):
-    return self._alive < 0
+    return self._alive < 0 or self.cur_time >= 1000
 
   def move_robot(self, init_x, init_y, init_z):
     "Used by multiplayer stadium to move sideways, to another running lane."
@@ -73,6 +79,10 @@ class WalkerTargetPosBulletEnv(MJCFBaseBulletEnv): #literally just added like 10
   joints_at_limit_cost = -0.1  # discourage stuck joints
 
   def step(self, a):
+    if(self.is_rendering):
+      time.sleep(0.01)
+    self.cur_time += 1
+    #print(self.cur_time)
     #print("step step step")
     if not self.scene.multiplayer:  # if multiplayer, action first applied to all robots, then global step() called, then _step() for all robots with the same actions
       self.robot.apply_action(a)
@@ -147,6 +157,13 @@ class AntTargetPosBulletEnv(WalkerTargetPosBulletEnv):
   def __init__(self, render=False, **kwargs):
     self.robot = Ant()
     WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
+
+class AntTurnHighLevelEnv(AntTargetPosBulletEnv):
+  def __init__(self, render=False, **kwargs):
+    super().__init__(self, render, **kwargs)
+    self.action_space = project_config.LATENT_SIZE
+
+
 
 if __name__ == "__main__":
   print(AntTargetPosBulletEnv().reset())
