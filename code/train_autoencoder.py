@@ -39,7 +39,7 @@ class AutoencoderWrapper:
     def __init__(
             self,
             env,
-            checkpoint_path="./autoencoder_pretrained",
+            checkpoint_path="./autoencoder_pretrained/",
             print_freq=10,
         ):
         self.checkpoint_path = checkpoint_path
@@ -84,7 +84,7 @@ class AutoencoderWrapper:
             print("--------------------------SAVING MODEL-------------------------")
             print("saving encoder model at: " + self.checkpoint_path + "encoder.pth")
             print("saving decoder model at: " + self.checkpoint_path + "decoder.pth")
-            self.autoencoder.save(self.checkpoint_path + "encoder.pth")
+            self.autoencoder.save(self.checkpoint_path)
             print("save successful")
             print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
             print("---------------------------------------------------------------")
