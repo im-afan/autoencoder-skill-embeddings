@@ -31,7 +31,7 @@ class WalkerTargetPosBulletEnv(
             self.logging = kwargs["logging"]
         except:
             self.logging = False
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="human")
+        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="rgb_array")
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
@@ -199,7 +199,6 @@ class AntTargetPosBulletEnv(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
         self.robot = Ant()
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
-
 
 class AntTurnHighLevelEnv(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
