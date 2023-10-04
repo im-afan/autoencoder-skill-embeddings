@@ -31,7 +31,7 @@ class WalkerTargetPosBulletEnv(
             self.logging = kwargs["logging"]
         except:
             self.logging = False
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="rgb_array")
+        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="human")
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
@@ -64,6 +64,7 @@ class WalkerTargetPosBulletEnv(
             self.ordered_joints,
             self.robot_body,
         ) = self.robot.addToScene(self._p, self.stadium_scene.ground_plane_mjcf)
+        #(self.parts, self.jdict, self.ordered_joints, self.robot_body) = (self.robot.parts, self.robot.jdict, self.robot.ordered_joints, self.robot.robot_body) 
         self.ground_ids = set(
             [
                 (
