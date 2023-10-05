@@ -12,13 +12,13 @@ import torch
 from torch import nn
 from gymnasium.spaces import Box
 from movement_autoencoder import Decoder
-
+from pybullet_envs_gymnasium.scene_stadium import StadiumScene
 
 class WalkerTargetPosBulletEnv(
     MJCFBaseBulletEnv
 ):  # literally just added like 10 lines to the original impl lol
-    def __init__(self, robot: WalkerBase, render=False, target_dist=1e3, **kwargs):
-        # print("WalkerBase::__init__ start")
+    def __init__(self, robot: WalkerBase, custom_scene_=None, render=False, use_obstacles=False, target_dist=1e3, **kwargs):
+        print("WalkerBase::__init__ start")
         self.camera_x = 0
         self.walk_target_x = target_dist  # kilometer away
         self.walk_target_y = 0
@@ -27,6 +27,13 @@ class WalkerTargetPosBulletEnv(
         self.target = 0
         self.cur_time = 0
         self.is_rendering = render
+
+        print(render)
+        self.scene_class = SinglePlayerStadiumScene 
+        print(kwargs)
+        if("custom_scene" in kwargs):
+            self.scene_class = kwargs["custom_scene"] 
+        print("scene1", self.scene_class)
         try:
             self.logging = kwargs["logging"]
         except:
@@ -35,8 +42,13 @@ class WalkerTargetPosBulletEnv(
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
+        self.test = "alsdjnflsdjf"
+
     def create_single_player_scene(self, bullet_client):
-        self.stadium_scene = SinglePlayerStadiumScene(
+        print("WalkerBase::create_player_scene start")
+        print("test", self.test)
+        print("scene", self.scene_class)
+        self.stadium_scene = self.scene_class(
             bullet_client, gravity=9.8, timestep=0.0165 / 4, frame_skip=4
         )
         return self.stadium_scene
@@ -58,12 +70,18 @@ class WalkerTargetPosBulletEnv(
         r = MJCFBaseBulletEnv.reset(self)
         self._p.configureDebugVisualizer(pybullet.COV_ENABLE_RENDERING, 0)
 
+        floor = self.stadium_scene.ground_plane_mjcf
+        try:
+            cube = self.stadium_scene.obstacle_cube_mjcf
+            self.robot.addToScene(self._p, cube)
+        except:
+            pass
         (
             self.parts,
             self.jdict,
             self.ordered_joints,
             self.robot_body,
-        ) = self.robot.addToScene(self._p, self.stadium_scene.ground_plane_mjcf)
+        ) = self.robot.addToScene(self._p, floor)
         #(self.parts, self.jdict, self.ordered_joints, self.robot_body) = (self.robot.parts, self.robot.jdict, self.robot.ordered_joints, self.robot.robot_body) 
         self.ground_ids = set(
             [
