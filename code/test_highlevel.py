@@ -8,7 +8,8 @@ from register_envs import register_envs
 
 register_envs()
 
-sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosHighLevel-v0", "--folder", "logs/", "-n", "10000"]
+#sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosHighLevel-v0", "--folder", "logs/", "-n", "10000"]
+sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleHighLevel-v0", "--folder", "logs/", "-n", "10000"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
 
 enjoy()

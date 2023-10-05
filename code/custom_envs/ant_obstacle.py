@@ -88,8 +88,10 @@ class AntObstacleLowLevelEnv(WalkerTargetPosBulletEnv):
 
 class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
-        self.robot = AntObstacle()
-        WalkerTargetPosBulletEnv.__init__(self, self.robot, render, scene=SinglePlayerStadiumSceneObstacle, **kwargs)
+        self.robot = Ant()
+        scene = SinglePlayerStadiumSceneObstacle
+        kwargs["custom_scene"] = scene
+        WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
         
         try:
             state_dict = torch.load(kwargs["decoder_path"])

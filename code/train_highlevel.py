@@ -6,7 +6,7 @@ import sys
 register_envs()
 
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosHighLevelEnv-v0", "--folder", "logs/", "-n", "10000"]
-sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosHighLevel-v0", "--eval-freq", "100000", "-P"]
+sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleHighLevel-v0", "--eval-freq", "100000", "-P"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
 
 train()
