@@ -58,7 +58,7 @@ class AutoencoderWrapper:
         action_dim = env.action_space.shape[0]
         self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE)
     
-    def train(self, epochs=10):
+    def train(self, epochs=20):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
         loss_fn = nn.MSELoss()
         running_loss = 0

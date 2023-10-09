@@ -18,7 +18,6 @@ class WalkerTargetPosBulletEnv(
     MJCFBaseBulletEnv
 ):  # literally just added like 10 lines to the original impl lol
     def __init__(self, robot: WalkerBase, custom_scene_=None, render=False, use_obstacles=False, target_dist=1e3, **kwargs):
-        print("WalkerBase::__init__ start")
         self.camera_x = 0
         self.walk_target_x = target_dist  # kilometer away
         self.walk_target_y = 0
@@ -26,28 +25,24 @@ class WalkerTargetPosBulletEnv(
         self.target_dist = target_dist
         self.target = 0
         self.cur_time = 0
-        self.is_rendering = render
+        try:
+            self.use_target_pos = kwargs["use_target_pos"]
+        except:
+            self.use_target_pos = True
 
-        print(render)
         self.scene_class = SinglePlayerStadiumScene 
-        print(kwargs)
         if("custom_scene" in kwargs):
             self.scene_class = kwargs["custom_scene"] 
-        print("scene1", self.scene_class)
         try:
             self.logging = kwargs["logging"]
         except:
             self.logging = False
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode="human")
+        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=kwargs["render_mode"])
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
-        self.test = "alsdjnflsdjf"
 
     def create_single_player_scene(self, bullet_client):
-        print("WalkerBase::create_player_scene start")
-        print("test", self.test)
-        print("scene", self.scene_class)
         self.stadium_scene = self.scene_class(
             bullet_client, gravity=9.8, timestep=0.0165 / 4, frame_skip=4
         )
@@ -124,8 +119,6 @@ class WalkerTargetPosBulletEnv(
     joints_at_limit_cost = -0.1  # discourage stuck joints
 
     def step(self, a):
-        if self.is_rendering:
-            time.sleep(0.01)
         self.cur_time += 1
         # print(self.cur_time)
         # print("step step step")
@@ -153,7 +146,13 @@ class WalkerTargetPosBulletEnv(
             done = True
 
         potential_old = self.potential
-        self.potential = self.robot.calc_potential()
+        if(self.use_target_pos):
+            self.potential = self.robot.calc_potential()
+        else:
+            pos_x, pos_y, pos_z = self.robot.body_xyz
+            dist = np.sqrt(pos_x**2 + pos_y**2)
+            self.potential = -(self.target_dist-dist)/self.robot.scene.dt
+            #print("dist frm origin: {}".format(dist))
         progress = float(self.potential - potential_old)
 
         feet_collision_cost = 0.0

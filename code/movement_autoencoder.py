@@ -6,7 +6,8 @@ class Encoder(nn.Module):
     def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
         self.dense1 = nn.Linear(observation_size+action_size, hidden_size)
-        self.dense2 = nn.Linear(hidden_size, latent_size)
+        self.dense2 = nn.Linear(hidden_size, hidden_size)
+        self.dense3 = nn.Linear(hidden_size, latent_size)
         
     def forward(self, state_orig, action):
         x = torch.concat((state_orig, action), dim=1)
@@ -14,17 +15,21 @@ class Encoder(nn.Module):
         x = self.dense1(x);
         x = nn.ReLU()(x)
         x = self.dense2(x);
+        x = nn.ReLU()(x)
+        x = self.dense3(x);
         x = nn.Sigmoid()(x)
         return x
 
 class Decoder(nn.Module):
     def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
-        print("wanted shape: ", observation_size+latent_size)
+        print("wanted shape: ", observation_size,latent_size)
         self.dense1 = nn.Linear(observation_size+latent_size, hidden_size) # takes in original state + embedding
-        self.dense2 = nn.Linear(hidden_size, action_size)
+        self.dense2 = nn.Linear(hidden_size, hidden_size)
+        self.dense3 = nn.Linear(hidden_size, action_size)
 
     def forward(self, state_orig, latent_encoding):
+        #print(state_orig.shape, latent_encoding.shape)
         if(len(state_orig.shape) == 2):
             x = torch.concat((state_orig, latent_encoding), dim=1)
         else:
@@ -32,6 +37,8 @@ class Decoder(nn.Module):
         x = self.dense1(x)
         x = nn.ReLU()(x)
         x = self.dense2(x)
+        x = nn.ReLU()(x)
+        x = self.dense3(x);
         #x = nn.Sigmoid()(x)
         return x
 

@@ -18,7 +18,6 @@ class ObstacleStadiumScene(Scene):
 
     def episode_restart(self, bullet_client):
         self._p = bullet_client
-        print("hERE ASLJNFLKSJNFDKLSFSNLAS DLASNDFLSDFANDALDFLAS FLASNFLNDLKDFF")
         Scene.episode_restart(self, bullet_client)  # contains cpp_world.clean_everything()
         if self.stadiumLoaded == 0:
             self.stadiumLoaded = 1
@@ -31,9 +30,9 @@ class ObstacleStadiumScene(Scene):
             self.ground_plane_mjcf = self._p.loadSDF(filename)
             filename = os.path.join(pybullet_data.getDataPath(), "cube.urdf")
             self.obstacle_cube_mjcf1 = self._p.loadURDF(filename, basePosition=[0, 3, 1], globalScaling=2)
-            self.obstacle_cube_mjcf2 = self._p.loadURDF(filename, basePosition=[0, -3, 1], globalScaling=2)
-            self.obstacle_cube_mjcf3 = self._p.loadURDF(filename, basePosition=[3, 0, 1], globalScaling=2)
-            self.obstacle_cube_mjcf4 = self._p.loadURDF(filename, basePosition=[-3, 0, 1], globalScaling=2)
+            self.obstacle_cube_mjcf2 = self._p.loadURDF(filename, basePosition=[0, -4, 1], globalScaling=2)
+            self.obstacle_cube_mjcf3 = self._p.loadURDF(filename, basePosition=[4, 0, 1], globalScaling=2)
+            self.obstacle_cube_mjcf4 = self._p.loadURDF(filename, basePosition=[-4, 0, 1], globalScaling=2)
             obstacle_list = [self.obstacle_cube_mjcf1, self.obstacle_cube_mjcf2, self.obstacle_cube_mjcf3, self.obstacle_cube_mjcf4]
 
             # filename = os.path.join(pybullet_data.getDataPath(),"stadium_no_collision.sdf")
@@ -81,6 +80,7 @@ class AntObstacleLowLevelEnv(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
         self.robot = Ant()
         scene = SinglePlayerStadiumSceneObstacle
+        kwargs["use_target_pos"] = False
         kwargs["custom_scene"] = scene
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render=render, **kwargs)
         #self.robot
@@ -91,28 +91,33 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         self.robot = Ant()
         scene = SinglePlayerStadiumSceneObstacle
         kwargs["custom_scene"] = scene
+        kwargs["use_target_pos"] = False
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
         
         try:
             state_dict = torch.load(kwargs["decoder_path"])
         except:
             state_dict = torch.load("./autoencoder_pretrained/decoder.pth")
-        print(WalkerTargetPosBulletEnv)
+        #print(self.action_space.shape[0], self.observation_space.shape[0])
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
                                project_config.AUTOENCODER_LATENT_SIZE)
         self.decoder.load_state_dict(state_dict)
 
         self.action_space = Box(
-            np.zeros(project_config.AUTOENCODER_LATENT_SIZE), 
-            np.ones(project_config.AUTOENCODER_LATENT_SIZE)
+            np.full((project_config.AUTOENCODER_LATENT_SIZE), -np.inf), 
+            np.full((project_config.AUTOENCODER_LATENT_SIZE), np.inf)
         )
+
+        #print(self.action_space)
 
         
     def step(self, a):
         state = torch.tensor(self.robot.calc_state())
         latent = torch.tensor(a)
+        #print("a shape: ", a.shape)
         action = self.decoder(state, latent).detach().numpy()
+        #action = np.ones_like(action) / 3
         #print(action)
         return super().step(action)
 

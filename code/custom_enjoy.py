@@ -154,7 +154,7 @@ def enjoy() -> None:  # noqa: C901
     if args.env_kwargs is not None:
         env_kwargs.update(args.env_kwargs)
     env_kwargs["logging"] = True 
-    env_kwargs["render"] = False 
+    env_kwargs["render"] = True 
 
     log_dir = args.reward_log if args.reward_log != "" else None
 
