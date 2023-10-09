@@ -1,3 +1,4 @@
+from math import sqrt
 import pybullet
 import numpy as np
 import pybullet_envs_gymnasium
@@ -25,6 +26,7 @@ class WalkerTargetPosBulletEnv(
         self.target_dist = target_dist
         self.target = 0
         self.cur_time = 0
+        self.has_obstacles = False
         try:
             self.use_target_pos = kwargs["use_target_pos"]
         except:
@@ -33,11 +35,17 @@ class WalkerTargetPosBulletEnv(
         self.scene_class = SinglePlayerStadiumScene 
         if("custom_scene" in kwargs):
             self.scene_class = kwargs["custom_scene"] 
+            self.has_obstacles = True
         try:
             self.logging = kwargs["logging"]
         except:
             self.logging = False
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=kwargs["render_mode"])
+
+        try:
+            render_mode = kwargs["render_mode"]
+        except:
+            render_mode = "rgb_array"
+        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=render_mode)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
@@ -176,6 +184,18 @@ class WalkerTargetPosBulletEnv(
         joints_at_limit_cost = float(
             self.joints_at_limit_cost * self.robot.joints_at_limit
         )
+
+        obstacle_cost = 0
+        if(self.has_obstacles):
+            #todo account for more obstacles
+            obstacle_centers = [(3, 0), (-3, 0), (0, 3), (0, -3)]
+            min_dist = 1e9
+            for obstacle in obstacle_centers:
+                dist = np.sqrt((pos_x-obstacle[0])**2 + (pos_y-obstacle[1])**2)
+                min_dist = min(min_dist, dist)
+            obstacle_cost = (1/self.target_dist)*min_dist/self.scene.dt
+            
+
         debugmode = 0
         if debugmode:
             print("alive=")
@@ -188,6 +208,9 @@ class WalkerTargetPosBulletEnv(
             print(joints_at_limit_cost)
             print("feet_collision_cost")
             print(feet_collision_cost)
+            print("obstacle_cost")
+            print(obstacle_cost)
+            time.sleep(0.2)
 
         self.rewards = [
             self._alive,
@@ -195,6 +218,7 @@ class WalkerTargetPosBulletEnv(
             electricity_cost,
             joints_at_limit_cost,
             feet_collision_cost,
+            obstacle_cost,
         ]
         if debugmode:
             print("rewards=")
