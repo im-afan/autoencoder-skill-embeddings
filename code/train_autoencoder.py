@@ -93,5 +93,5 @@ class AutoencoderWrapper:
         pass
 
 if __name__ == '__main__':
-    autoencoder_trainer = AutoencoderWrapper(AntTargetPosBulletEnv())
+    autoencoder_trainer = AutoencoderWrapper(AntTargetPosBulletEnv(), checkpoint_path="./autoencoder_pretrained_size2/")
     autoencoder_trainer.train()

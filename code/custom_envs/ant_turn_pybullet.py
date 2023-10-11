@@ -27,15 +27,24 @@ class WalkerTargetPosBulletEnv(
         self.target = 0
         self.cur_time = 0
         self.has_obstacles = False
+        self.target_velocity = 0
+        self.obstacle_potential = 0
+
         try:
             self.use_target_pos = kwargs["use_target_pos"]
         except:
             self.use_target_pos = True
 
         self.scene_class = SinglePlayerStadiumScene 
+
+        self.use_target_velocity = False
+        if("target_velocity" in kwargs):
+            self.use_target_velocity = kwargs["target_velocity"]
+
         if("custom_scene" in kwargs):
             self.scene_class = kwargs["custom_scene"] 
             self.has_obstacles = True
+
         try:
             self.logging = kwargs["logging"]
         except:
@@ -45,6 +54,7 @@ class WalkerTargetPosBulletEnv(
             render_mode = kwargs["render_mode"]
         except:
             render_mode = "rgb_array"
+
         MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=render_mode)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
@@ -59,6 +69,7 @@ class WalkerTargetPosBulletEnv(
     def reset(self, **kwargs):
         self.cur_time = 0
         angle = np.random.uniform(0, np.pi)
+        target_velocity = np.random.uniform(1, 10)
         self.walk_target_x = np.cos(angle) * self.target_dist
         self.walk_target_y = np.sin(angle) * self.target_dist
         # print("angle: {}, cos: {}, sin: {}".format(angle, np.cos(angle), np.sin(angle)))
@@ -157,10 +168,13 @@ class WalkerTargetPosBulletEnv(
         if(self.use_target_pos):
             self.potential = self.robot.calc_potential()
         else:
+            target_x, target_y = 0, 10
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = np.sqrt(pos_x**2 + pos_y**2)
-            self.potential = -(self.target_dist-dist)/self.robot.scene.dt
+            dist = np.sqrt((pos_x)**2 + (pos_y)**2)
+            self.potential = dist**2/self.robot.scene.dt
+            #print("x: {}, y: {}".format(pos_x, pos_y))
             #print("dist frm origin: {}".format(dist))
+        #print(self.potential, potential_old)
         progress = float(self.potential - potential_old)
 
         feet_collision_cost = 0.0
@@ -185,15 +199,18 @@ class WalkerTargetPosBulletEnv(
             self.joints_at_limit_cost * self.robot.joints_at_limit
         )
 
-        obstacle_cost = 0
+        prev_obstacle_potential = self.obstacle_potential
+        obstacle_progress = 0
         if(self.has_obstacles):
             #todo account for more obstacles
-            obstacle_centers = [(3, 0), (-3, 0), (0, 3), (0, -3)]
+            obstacle_centers = [(4, 0), (-4, 0), (0, 4), (0, -4)]
             min_dist = 1e9
             for obstacle in obstacle_centers:
                 dist = np.sqrt((pos_x-obstacle[0])**2 + (pos_y-obstacle[1])**2)
                 min_dist = min(min_dist, dist)
-            obstacle_cost = (1/self.target_dist)*min_dist/self.scene.dt
+            self.obstacle_potential = min_dist/self.scene.dt
+            obstacle_progress = self.obstacle_potential-prev_obstacle_potential
+        obstacle_progress *= 1/(1+progress)
             
 
         debugmode = 0
@@ -209,8 +226,8 @@ class WalkerTargetPosBulletEnv(
             print("feet_collision_cost")
             print(feet_collision_cost)
             print("obstacle_cost")
-            print(obstacle_cost)
-            time.sleep(0.2)
+            print(obstacle_progress)
+            time.sleep(0.01)
 
         self.rewards = [
             self._alive,
@@ -218,7 +235,7 @@ class WalkerTargetPosBulletEnv(
             electricity_cost,
             joints_at_limit_cost,
             feet_collision_cost,
-            obstacle_cost,
+            #obstacle_progress,
         ]
         if debugmode:
             print("rewards=")
