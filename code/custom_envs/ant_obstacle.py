@@ -2,7 +2,7 @@ import os
 import pybullet_data
 import pybullet
 from pybullet_envs_gymnasium.robot_locomotors import WalkerBase, Ant
-from custom_envs.ant_turn_pybullet import WalkerTargetPosBulletEnv
+from custom_envs.custom_walker import WalkerTargetPosBulletEnv
 import torch
 from movement_autoencoder import Decoder
 import project_config
@@ -98,7 +98,7 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
             state_dict = torch.load(kwargs["decoder_path"])
         except:
             state_dict = torch.load("./autoencoder_pretrained_size2/decoder.pth")
-        print(self.action_space.shape[0], self.observation_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE)
+        #print(self.action_space.shape[0], self.observation_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE)
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
                                project_config.AUTOENCODER_LATENT_SIZE)
@@ -109,13 +109,13 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
             np.ones((project_config.AUTOENCODER_LATENT_SIZE))
         )
 
-        print(self.action_space)
+        #print(self.action_space)
 
         
     def step(self, a):
         state = torch.tensor(self.robot.calc_state())
         latent = torch.tensor(a)
-        print("a shape: ", a.shape)
+        #print("a shape: ", a.shape)
         action = self.decoder(state, latent).detach().numpy()
         #action = np.ones_like(action) / 3
         #print(action)

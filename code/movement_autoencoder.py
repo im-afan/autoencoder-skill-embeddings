@@ -23,13 +23,13 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
-        print("wanted shape: ", observation_size,latent_size)
+        #print("wanted shape: ", observation_size,latent_size)
         self.dense1 = nn.Linear(observation_size+latent_size, hidden_size) # takes in original state + embedding
         self.dense2 = nn.Linear(hidden_size, hidden_size)
         self.dense3 = nn.Linear(hidden_size, action_size)
 
     def forward(self, state_orig, latent_encoding):
-        print(state_orig.shape, latent_encoding.shape)
+        #print(state_orig.shape, latent_encoding.shape)
         if(len(state_orig.shape) == 2):
             x = torch.concat((state_orig, latent_encoding), dim=1)
         else:

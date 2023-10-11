@@ -169,7 +169,7 @@ class WalkerTargetPosBulletEnv(
             self.potential = self.robot.calc_potential()
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = np.sqrt(pos_x**2 + pos_y**2)
+            dist = (abs(pos_x)**1.25 + abs(pos_y)**1.25)**(1/1.25)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
@@ -233,7 +233,7 @@ class WalkerTargetPosBulletEnv(
             electricity_cost,
             joints_at_limit_cost,
             feet_collision_cost,
-            obstacle_progress,
+            #obstacle_progress,
         ]
         if debugmode:
             print("rewards=")
