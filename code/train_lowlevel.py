@@ -1,7 +1,7 @@
 import sys
 from rl_zoo3.train import train
 import gymnasium as gym
-from custom_envs.ant_turn_pybullet import AntTargetPosBulletEnv
+from custom_envs.ant_turn_pybullet import AntTargetPosLowLevel
 from register_envs import register_envs
 
 register_envs()

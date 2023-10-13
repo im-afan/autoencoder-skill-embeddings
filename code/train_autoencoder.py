@@ -1,6 +1,6 @@
 import project_config
 import logger
-from custom_envs.ant_turn_pybullet import AntTargetPosBulletEnv
+from custom_envs.ant_turn_pybullet import AntTargetPosLowLevel
 from custom_envs.humanoid_turn import HumanoidTargetPosLowLevel
 
 import os

@@ -39,6 +39,8 @@ class WalkerTargetPosBulletEnv(
 
         self.use_target_velocity = False
         if("target_velocity" in kwargs):
+            self.min_target_dist = 5
+            self.max_target_dist = 20
             self.use_target_velocity = kwargs["target_velocity"]
 
         if("custom_scene" in kwargs):
@@ -69,7 +71,10 @@ class WalkerTargetPosBulletEnv(
     def reset(self, **kwargs):
         self.cur_time = 0
         angle = np.random.uniform(0, np.pi)
-        target_velocity = np.random.uniform(1, 10)
+        target_dist = self.target_dist
+        if(self.use_target_velocity):
+            self.target_dist = np.random.uniform(self.min_target_dist, self.max_target_dist)
+        self.target_velocity = target_dist/1000
         self.walk_target_x = np.cos(angle) * self.target_dist
         self.walk_target_y = np.sin(angle) * self.target_dist
         # print("angle: {}, cos: {}, sin: {}".format(angle, np.cos(angle), np.sin(angle)))
@@ -173,7 +178,10 @@ class WalkerTargetPosBulletEnv(
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
-        progress = float(self.potential - potential_old)
+        if(self.use_target_velocity):
+            progress = float(self.potential - potential_old)
+        else:
+            progress = float(abs(self.target_velocity/self.robot.scene.dt - (self.potential - potential_old)))
 
         feet_collision_cost = 0.0
         for i, f in enumerate(
@@ -250,37 +258,3 @@ class WalkerTargetPosBulletEnv(
 
         self.camera_x = x
         self.camera.move_and_look_at(self.camera_x, y, 1.4, x, y, 1.0)
-
-class HumanoidTargetPosLowLevel(WalkerTargetPosBulletEnv):
-    def __init__(self, render=False, **kwargs):
-        self.robot = Humanoid()
-        WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
-
-class HumanoidTargetPosHighLevel(WalkerTargetPosBulletEnv):
-    def __init__(self, render=False, **kwargs):
-        self.robot = Humanoid()
-        WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
-        
-        try:
-            state_dict = torch.load(kwargs["decoder_path"])
-        except:
-            state_dict = torch.load("./autoencoder_pretrained/decoder.pth")
-        print(WalkerTargetPosBulletEnv)
-        self.decoder = Decoder(self.observation_space.shape[0],
-                               self.action_space.shape[0], 
-                               project_config.AUTOENCODER_LATENT_SIZE_ANT)
-        self.decoder.load_state_dict(state_dict)
-
-        self.action_space = Box(
-            np.zeros(project_config.AUTOENCODER_LATENT_SIZE_ANT), 
-            np.ones(project_config.AUTOENCODER_LATENT_SIZE_ANT)
-        )
-
-        
-    def step(self, a):
-        state = torch.tensor(self.robot.calc_state())
-        latent = torch.tensor(a)
-        action = self.decoder(state, latent).detach().numpy()
-        #print(action)
-        return super().step(action)
-
