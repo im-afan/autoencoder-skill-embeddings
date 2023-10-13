@@ -1,6 +1,7 @@
 import project_config
 import logger
 from custom_envs.ant_turn_pybullet import AntTargetPosBulletEnv
+from custom_envs.humanoid_turn import HumanoidTargetPosLowLevel
 
 import os
 import copy
@@ -47,16 +48,16 @@ class AutoencoderWrapper:
         if(len(logger.logged_states)):
             self.dataset = MovementDataset(logger.logged_states)
         else:
-            logged_orig_states = np.load("./logged_states/logged_orig_states.npy")
-            logged_end_states = np.load("./logged_states/logged_end_states.npy")
-            logged_actions = np.load("./logged_states/logged_actions.npy")
+            logged_orig_states = np.load("./logged_states_humanoid/logged_orig_states.npy")
+            logged_end_states = np.load("./logged_states_humanoid/logged_end_states.npy")
+            logged_actions = np.load("./logged_states_humanoid/logged_actions.npy")
             for i in range(len(logged_orig_states)):
                 logger.log_state(logged_orig_states[i], logged_end_states[i], logged_actions[i], 0)
             self.dataset = MovementDataset(logger.logged_states)
 
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
-        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE)
+        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_HUMANOID)
     
     def train(self, epochs=20):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
@@ -93,5 +94,5 @@ class AutoencoderWrapper:
         pass
 
 if __name__ == '__main__':
-    autoencoder_trainer = AutoencoderWrapper(AntTargetPosBulletEnv(), checkpoint_path="./autoencoder_pretrained_size2/")
+    autoencoder_trainer = AutoencoderWrapper(HumanoidTargetPosLowLevel(), checkpoint_path="./autoencoder_pretrained/humanoid/")
     autoencoder_trainer.train()

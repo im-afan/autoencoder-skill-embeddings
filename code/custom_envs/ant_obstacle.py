@@ -97,16 +97,16 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         try:
             state_dict = torch.load(kwargs["decoder_path"])
         except:
-            state_dict = torch.load("./autoencoder_pretrained_size2/decoder.pth")
+            state_dict = torch.load("./autoencoder_pretrained/ant/decoder.pth")
         #print(self.action_space.shape[0], self.observation_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE)
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
-                               project_config.AUTOENCODER_LATENT_SIZE)
+                               project_config.AUTOENCODER_LATENT_SIZE_ANT)
         self.decoder.load_state_dict(state_dict)
 
         self.action_space = Box(
-            np.zeros((project_config.AUTOENCODER_LATENT_SIZE)), 
-            np.ones((project_config.AUTOENCODER_LATENT_SIZE))
+            np.zeros((project_config.AUTOENCODER_LATENT_SIZE_ANT)), 
+            np.ones((project_config.AUTOENCODER_LATENT_SIZE_ANT))
         )
 
         #print(self.action_space)

@@ -19,16 +19,16 @@ class HumanoidTargetPosHighLevel(WalkerTargetPosBulletEnv):
         try:
             state_dict = torch.load(kwargs["decoder_path"])
         except:
-            state_dict = torch.load("./autoencoder_pretrained/decoder.pth")
+            state_dict = torch.load("./autoencoder_pretrained/humanoid/decoder.pth")
         print(WalkerTargetPosBulletEnv)
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
-                               project_config.AUTOENCODER_LATENT_SIZE)
+                               project_config.AUTOENCODER_LATENT_SIZE_HUMANOID)
         self.decoder.load_state_dict(state_dict)
 
         self.action_space = Box(
-            np.zeros(project_config.AUTOENCODER_LATENT_SIZE), 
-            np.ones(project_config.AUTOENCODER_LATENT_SIZE)
+            np.zeros(project_config.AUTOENCODER_LATENT_SIZE_HUMANOID), 
+            np.ones(project_config.AUTOENCODER_LATENT_SIZE_HUMANOID)
         )
 
         

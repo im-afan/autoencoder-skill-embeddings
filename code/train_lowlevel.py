@@ -10,6 +10,7 @@ register_envs()
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleLowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0", "--eval-freq", "1000", "-P"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
-sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosLowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
+#sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosLowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
+sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosLowLevel-v0", "--eval-freq", "100000", "-i", "logs/ppo/HumanoidTargetPosLowLevel-v0_1/HumanoidTargetPosLowLevel-v0.zip", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
 
 train()

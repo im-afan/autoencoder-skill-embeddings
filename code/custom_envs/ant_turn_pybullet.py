@@ -33,12 +33,12 @@ class AntTurnHighLevelEnv(WalkerTargetPosBulletEnv):
         print(WalkerTargetPosBulletEnv)
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
-                               project_config.AUTOENCODER_LATENT_SIZE)
+                               project_config.AUTOENCODER_LATENT_SIZE_ANT)
         self.decoder.load_state_dict(state_dict)
 
         self.action_space = Box(
-            np.zeros(project_config.AUTOENCODER_LATENT_SIZE), 
-            np.ones(project_config.AUTOENCODER_LATENT_SIZE)
+            np.zeros(project_config.AUTOENCODER_LATENT_SIZE_ANT), 
+            np.ones(project_config.AUTOENCODER_LATENT_SIZE_ANT)
         )
 
         
