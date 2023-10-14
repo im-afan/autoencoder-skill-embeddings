@@ -56,9 +56,8 @@ class WalkerTargetPosBulletEnv(
             render_mode = kwargs["render_mode"]
         except:
             render_mode = "rgb_array"
-        render_mode="rgb_array" #dont forget i added this @future andrew
 
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=render_mode)
+        MJCFBaseBulletEnv.__init__(self, robot, render)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 

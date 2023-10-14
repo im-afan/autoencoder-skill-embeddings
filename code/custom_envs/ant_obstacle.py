@@ -80,7 +80,7 @@ class AntObstacleLowLevelEnv(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
         self.robot = Ant()
         scene = SinglePlayerStadiumSceneObstacle
-        kwargs["use_target_pos"] = True 
+        kwargs["use_target_pos"] = False
         kwargs["custom_scene"] = scene
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render=render, **kwargs)
         #self.robot
@@ -91,7 +91,7 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         self.robot = Ant()
         scene = SinglePlayerStadiumSceneObstacle
         kwargs["custom_scene"] = scene
-        kwargs["use_target_pos"] = True 
+        kwargs["use_target_pos"] = False 
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
         
         try:
