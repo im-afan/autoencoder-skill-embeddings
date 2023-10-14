@@ -8,6 +8,7 @@ register_envs()
 
 wanted_env = sys.argv[1]
 sys.argv.pop(1);
-sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "tensorboard/"+wanted_env+"LowLevel", "-n", "750000", "-P"]
+sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "--eval-freq", "100000",
+                        "--tensorboard-log", "tensorboard/"+wanted_env+"LowLevel", "-n", "750000", "-P"]
 
 train()
