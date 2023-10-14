@@ -6,11 +6,8 @@ from register_envs import register_envs
 
 register_envs()
 
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosBulletEnv-v0", "--eval-freq", "100000", "-P"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleLowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0", "--eval-freq", "1000", "-P"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosLowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
-sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosLowLevel-v0", "--eval-freq", "100000", "-i", "logs/ppo/HumanoidTargetPosLowLevel-v0_1/HumanoidTargetPosLowLevel-v0.zip", "--tensorboard-log", "/tmp/stable-baselines", "-P"]
+wanted_env = sys.argv[1]
+sys.argv.pop(1);
+sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "--eval-freq", "100000", "--tensorboard-log", "tensorboard/"+wanted_env+"LowLevel", "-n", "750000", "-P"]
 
 train()

@@ -1,3 +1,5 @@
+import sys
+
 import project_config
 import logger
 from custom_envs.ant_turn_pybullet import AntTargetPosLowLevel
@@ -41,6 +43,7 @@ class AutoencoderWrapper:
             self,
             env,
             checkpoint_path="./autoencoder_pretrained/",
+            logged_states_path="./logged_states/",
             print_freq=10,
         ):
         self.checkpoint_path = checkpoint_path
@@ -48,9 +51,9 @@ class AutoencoderWrapper:
         if(len(logger.logged_states)):
             self.dataset = MovementDataset(logger.logged_states)
         else:
-            logged_orig_states = np.load("./logged_states_humanoid/logged_orig_states.npy")
-            logged_end_states = np.load("./logged_states_humanoid/logged_end_states.npy")
-            logged_actions = np.load("./logged_states_humanoid/logged_actions.npy")
+            logged_orig_states = np.load(logged_states_path+"logged_orig_states.npy")
+            logged_end_states = np.load(logged_states_path+"logged_end_states.npy")
+            logged_actions = np.load(logged_states_path+"logged_actions.npy")
             for i in range(len(logged_orig_states)):
                 logger.log_state(logged_orig_states[i], logged_end_states[i], logged_actions[i], 0)
             self.dataset = MovementDataset(logger.logged_states)
@@ -94,5 +97,14 @@ class AutoencoderWrapper:
         pass
 
 if __name__ == '__main__':
-    autoencoder_trainer = AutoencoderWrapper(HumanoidTargetPosLowLevel(), checkpoint_path="./autoencoder_pretrained/humanoid/")
+    try:
+        checkpoint_path = sys.argv[1]
+    except:
+        checkpoint_path = "./autoencoder_pretrained/humanoid/"
+
+    try:
+        logged_states_path = sys.argv[2]
+    except:
+        logged_states_path = "./logged_states/anttargetpos/"
+    autoencoder_trainer = AutoencoderWrapper(AntTargetPosLowLevel(), checkpoint_path=checkpoint_path, logged_states_path=logged_states_path)
     autoencoder_trainer.train()

@@ -9,11 +9,8 @@ from register_envs import register_envs
 register_envs()
 
 wanted_env = sys.argv[1]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosBulletEnv-v0", "--folder", "logs/", "-n", "40000"]
-sys.argv = ["python", "--algo", "ppo", "--env", wanted_env + "LowLevel-v0", "--folder", "logs/", "-n", "40000"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleHighLevel-v0", "--folder", "logs/", "-n", "10000"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntObstacleLowLevel-v0", "--folder", "logs/", "-n", "10000"]
-#sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
+sys.argv.pop(1)
+sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "-n", "40000"]
 
 enjoy()
-write_logs_to_file(log_path="./logged_states/"+wanted_env.lower())
+write_logs_to_file(log_path="./trials/logged_states/"+wanted_env.lower())

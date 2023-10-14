@@ -52,6 +52,7 @@ class AntTargetPosHighLevel(WalkerTargetPosBulletEnv):
 class AntTargetPosVelocityHighLevel(WalkerTargetPosBulletEnv):
     def __init__(self, render=False, **kwargs):
         self.robot = Ant()
+        kwargs["target_velocity"] = True
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
         
         try:
@@ -68,6 +69,13 @@ class AntTargetPosVelocityHighLevel(WalkerTargetPosBulletEnv):
             np.zeros(project_config.AUTOENCODER_LATENT_SIZE_ANT), 
             np.ones(project_config.AUTOENCODER_LATENT_SIZE_ANT)
         )
+    
+    def step(self, a):
+        state = torch.tensor(self.robot.calc_state())
+        latent = torch.tensor(a)
+        action = self.decoder(state, latent).detach().numpy()
+        #print(action)
+        return super().step(action)
 
 
 

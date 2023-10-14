@@ -179,9 +179,9 @@ class WalkerTargetPosBulletEnv(
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
         if(self.use_target_velocity):
-            progress = float(self.potential - potential_old)
+            progress = -float(abs(self.target_velocity - (self.potential - potential_old)))
         else:
-            progress = float(abs(self.target_velocity/self.robot.scene.dt - (self.potential - potential_old)))
+            progress = float(self.potential - potential_old)
 
         feet_collision_cost = 0.0
         for i, f in enumerate(
