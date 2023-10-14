@@ -29,7 +29,7 @@ class AntTargetPosHighLevel(WalkerTargetPosBulletEnv):
         try:
             state_dict = torch.load(kwargs["decoder_path"])
         except:
-            state_dict = torch.load("./autoencoder_pretrained/ant/decoder.pth")
+            state_dict = torch.load("./trials/autoencoders/decoder.pth")
         print(WalkerTargetPosBulletEnv)
         self.decoder = Decoder(self.observation_space.shape[0],
                                self.action_space.shape[0], 
