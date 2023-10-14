@@ -56,6 +56,7 @@ class WalkerTargetPosBulletEnv(
             render_mode = kwargs["render_mode"]
         except:
             render_mode = "rgb_array"
+        render_mode="rgb_array" #dont forget i added this @future andrew
 
         MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=render_mode)
         self.observation_space = self.observation_space
@@ -205,6 +206,7 @@ class WalkerTargetPosBulletEnv(
             self.joints_at_limit_cost * self.robot.joints_at_limit
         )
 
+        """
         prev_obstacle_potential = self.obstacle_potential
         obstacle_progress = 0
         if(self.has_obstacles):
@@ -217,7 +219,7 @@ class WalkerTargetPosBulletEnv(
             self.obstacle_potential = min_dist/self.scene.dt
             obstacle_progress = self.obstacle_potential-prev_obstacle_potential
         obstacle_progress *= 1/(1+progress)
-            
+        """
 
         debugmode = 0
         if debugmode:
@@ -231,8 +233,8 @@ class WalkerTargetPosBulletEnv(
             print(joints_at_limit_cost)
             print("feet_collision_cost")
             print(feet_collision_cost)
-            print("obstacle_cost")
-            print(obstacle_progress)
+            #print("obstacle_cost")
+            #print(obstacle_progress)
             time.sleep(0.01)
 
         self.rewards = [
