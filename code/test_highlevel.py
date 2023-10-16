@@ -10,7 +10,7 @@ register_envs()
 
 wanted_env = sys.argv[1]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntTargetPosHighLevel-v0", "--folder", "logs/", "-n", "10000"]
-sys.argv = ["python", "--algo", "ppo", "--env", wanted_env + "HighLevel-v0", "--folder", "logs/", "-n", "10000"]
+sys.argv = ["python", "--algo", "ppo", "--env", wanted_env + "HighLevel-v0", "--folder", "trials/1/agents", "-n", "10000"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "HumanoidTargetPosHighLevel-v0", "--folder", "logs/", "-n", "10000"]
 #sys.argv = ["python", "--algo", "ppo", "--env", "AntBulletEnv-v0"]
 
