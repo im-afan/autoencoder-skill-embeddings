@@ -1,12 +1,20 @@
 \documentclass[a4paper]{article}
 
+\usepackage{graphicx}
+\usepackage[
+backend=biber,
+style=alphabetic,
+]{biblatex}
+
+\addbibresource{citations.bib}
+
 \title{Low-Level Latent Space Skill Representations for Reuse in High-Level Environments}
 \author{Andrew Fan}
 
 \begin{document}
 \maketitle
 \section{Abstract}
-While reinforcement learning (RL) algorithms have shown promising results in preforming robot locomotion tasks,
+\hspace{10mm} While reinforcement learning (RL) algorithms have shown promising results in preforming robot locomotion tasks,
 training times for large, complex environments take too long and are unfeasible. Many methods today require 
 an agent to restart training for new environments, resulting in redudant skills being retrained every iteration.
 Other methods require motion capture data for pretraining, which is unfeasible for robots that do not mimic living organisms.
@@ -14,16 +22,19 @@ In this paper, I propose a method for faster, completely unsupervised method for
 
 \section{Related Work}
 
+
 \section{Reinforcement Learning Background}
 \section{Autoencoders Background}
 \section{Method}
 
 \section{Results}
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics[width=0.25\linewidth]{./figs/obstacle-scratch-vs-autoencoder.png}
-\caption{\label{fig:frog}This frog was uploaded via the file-tree menu.}
+\includegraphics[width=1\linewidth]{./figs/obstacle-scratch-vs-autoencoder.png}
+\caption{Results for training on an obstacle environment.}
 \end{figure}
 
 \section{Future Work}
+
+\printbibliography
 \end{document}
