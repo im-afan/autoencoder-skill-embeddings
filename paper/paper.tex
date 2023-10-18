@@ -1,32 +1,29 @@
 \documentclass[a4paper]{article}
+
+\title{Low-Level Latent Space Skill Representations for Reuse in High-Level Environments}
+\author{Andrew Fan}
+
 \begin{document}
-\large 
-Actor-Critic Method Background\linebreak
-\normalsize
-A policy $\pi_\theta(A|S)$ gives the probability of taking action A given S.\linebreak
-The goal then is to maximze the objective function 
-$$C_{t_0}(\theta) = E[\sum_{t=t_0}^{\infty} \log(\pi_\theta(a_t|s_t)) * R(a_t|s_t)],$$
-where $R(A|S)$ represents the reward from taking action A at state S. We then define 
-$$Q(a_t|s_t) = C_{t}(\theta|a_t),$$
-representing the q-value. The q-value of taking an action $A$ at state $S$ is equal to the expected sum of the discounted rewards, 
-given that the action taken at time $t$ is $a_t$.
-We now define two agents: an actor, $\pi_\theta(A|S)$, which predicts the probability of taking action $A$ at state $S$, and critic $q_\theta(a_t|s_t)$,
-which predics the value of $Q(a_t|s_t)$. Now, as the actor trains on the environment, the critic can be optimized by looking at the actor's total reward after an episode,
-and the actor is able to learn using the critic's predicted q-values. [TODO MAKE MORE DETAILED]\linebreak
-\large
-REINFORCE Background
-\linebreak
-\large Encoder-Decoder definition
-\normal
-We define an encoder $E(s, s')$ that encodes the transition from a state s to s' into a latent space, and a decoder $D(s, l)$ that reconstructs 
-the transition from the latent space encoding concatenated with the original state.
-\large
-Title about my algorithm
-\normalsize
+\maketitle
+\section{Abstract}
+While reinforcement learning (RL) algorithms have shown promising results in preforming robot locomotion tasks,
+training times for large, complex environments take too long and are unfeasible. Many methods today require 
+an agent to restart training for new environments, resulting in redudant skills being retrained every iteration.
+Other methods require motion capture data for pretraining, which is unfeasible for robots that do not mimic living organisms.
+In this paper, I propose a method for faster, completely unsupervised method for training on complex environments.
 
-The agent will be trained on low-level, general tasks, such as walking forward and turning.
-After these low-level skills have been developed, we can map movements into a latent space using an autoencoder
-then, another agent will be able to learn to perform specific tasks using generalized skills by 
-predicting actions on the latent space instead of raw movements.
+\section{Related Work}
 
+\section{Reinforcement Learning Background}
+\section{Autoencoders Background}
+\section{Method}
+
+\section{Results}
+\begin{figure}
+\centering
+\includegraphics[width=0.25\linewidth]{./figs/obstacle-scratch-vs-autoencoder.png}
+\caption{\label{fig:frog}This frog was uploaded via the file-tree menu.}
+\end{figure}
+
+\section{Future Work}
 \end{document}
