@@ -60,7 +60,7 @@ class AutoencoderWrapper:
 
         state_dim = env.observation_space.shape[0]
         action_dim = env.action_space.shape[0]
-        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_HUMANOID)
+        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_ANT)
     
     def train(self, epochs=20):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)

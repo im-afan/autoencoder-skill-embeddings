@@ -30,7 +30,12 @@ class AntTargetPosHighLevel(WalkerTargetPosBulletEnv):
             state_dict = torch.load(kwargs["decoder_path"])
         except:
             state_dict = torch.load("./autoencoder_pretrained/ant/decoder.pth")
-        state_dict = torch.load(project_config.DECODER_PATH)
+
+        decoder_path = project_config.DECODER_PATH
+        with open("cur_path.txt", "r") as f:
+            decoder_path = f.readline()
+            decoder_path += "/autoencoders/decoder.pth"
+        state_dict = torch.load(decoder_path)
 
         print(WalkerTargetPosBulletEnv)
         self.decoder = Decoder(self.observation_space.shape[0],
