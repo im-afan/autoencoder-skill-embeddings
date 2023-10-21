@@ -21,7 +21,7 @@ class Encoder(nn.Module):
         return x
 
 class Decoder(nn.Module):
-    def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
+    def __init__(self, observation_size, action_size, latent_size, hidden_size=64):
         super().__init__()
         #print("wanted shape: ", observation_size,latent_size)
         self.dense1 = nn.Linear(observation_size+latent_size, hidden_size) # takes in original state + embedding
@@ -43,7 +43,7 @@ class Decoder(nn.Module):
         return x
 
 class Autoencoder(nn.Module):
-    def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
+    def __init__(self, observation_size, action_size, latent_size, hidden_size=64):
         super().__init__()
         self.encoder = Encoder(observation_size, action_size, latent_size, hidden_size=hidden_size)
         self.decoder = Decoder(observation_size, action_size, latent_size, hidden_size=hidden_size)
