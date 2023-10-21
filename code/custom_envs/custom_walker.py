@@ -70,7 +70,7 @@ class WalkerTargetPosBulletEnv(
 
     def reset(self, **kwargs):
         self.cur_time = 0
-        angle = np.random.uniform(0, np.pi)
+        angle = np.random.uniform(0, 2*np.pi)
         target_dist = self.target_dist
         if(self.use_target_velocity):
             self.target_dist = np.random.uniform(self.min_target_dist, self.max_target_dist)
@@ -174,7 +174,7 @@ class WalkerTargetPosBulletEnv(
             self.potential = self.robot.calc_potential()
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = (abs(pos_x)**1.25 + abs(pos_y)**1.25)**(1/1.25)
+            dist = (abs(pos_x)**2 + abs(pos_y)**2)**(1/2)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)

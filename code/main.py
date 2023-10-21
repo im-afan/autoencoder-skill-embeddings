@@ -4,8 +4,8 @@ import project_config
 
 subprocess.run("ls")
 
-for seed in range(0, 2):
-    np.random.seed(seed)
+for seed in range(0, 3):
+    np.seed(seed)
     folder = "trials/" + str(seed)
     with open("cur_path.txt", "w") as f:
         f.write(folder)
