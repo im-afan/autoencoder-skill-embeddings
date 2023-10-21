@@ -70,7 +70,7 @@ class WalkerTargetPosBulletEnv(
 
     def reset(self, **kwargs):
         self.cur_time = 0
-        angle = np.random.uniform(0, 2*np.pi)
+        angle = np.random.uniform(0, np.pi)
         target_dist = self.target_dist
         if(self.use_target_velocity):
             self.target_dist = np.random.uniform(self.min_target_dist, self.max_target_dist)
