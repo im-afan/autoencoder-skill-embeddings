@@ -101,9 +101,9 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
 
 
         decoder_path = project_config.DECODER_PATH
-        #with open("cur_path.txt", "r") as f:
-        #    decoder_path = f.readline()
-        #    decoder_path += "/autoencoders/decoder.pth"
+        with open("cur_path.txt", "r") as f:
+            decoder_path = f.readline()
+            decoder_path += "/autoencoders/decoder.pth"
         state_dict = torch.load(decoder_path)
         #print(self.action_space.shape[0], self.observation_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE)
         self.decoder = Decoder(self.observation_space.shape[0],
