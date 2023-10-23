@@ -175,7 +175,7 @@ class WalkerTargetPosBulletEnv(
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
             dist = abs(pos_x)**1.25 + abs(pos_y)**1.25
-            diff = diff ** 1/1.25
+            dist = dist ** 1/1.25
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
