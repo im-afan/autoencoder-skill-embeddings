@@ -43,7 +43,7 @@ class Decoder(nn.Module):
         return x
 
 class Autoencoder(nn.Module):
-    def __init__(self, observation_size, action_size, latent_size, hidden_size=64):
+    def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
         self.encoder = Encoder(observation_size, action_size, latent_size, hidden_size=hidden_size)
         self.decoder = Decoder(observation_size, action_size, latent_size, hidden_size=hidden_size)
