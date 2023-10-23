@@ -57,7 +57,7 @@ class WalkerTargetPosBulletEnv(
         except:
             render_mode = "rgb_array"
 
-        MJCFBaseBulletEnv.__init__(self, robot, render)
+        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
@@ -174,7 +174,7 @@ class WalkerTargetPosBulletEnv(
             self.potential = self.robot.calc_potential()
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = (abs(pos_x)**2 + abs(pos_y)**2)**(1/2)
+            dist = abs(pos_x) + abs(pos_y)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)

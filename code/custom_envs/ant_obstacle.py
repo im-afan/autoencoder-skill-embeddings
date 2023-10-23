@@ -29,7 +29,7 @@ class ObstacleStadiumScene(Scene):
             filename = os.path.join(pybullet_data.getDataPath(), "plane_stadium.sdf")
             self.ground_plane_mjcf = self._p.loadSDF(filename)
             filename = os.path.join(pybullet_data.getDataPath(), "cube.urdf")
-            self.obstacle_cube_mjcf1 = self._p.loadURDF(filename, basePosition=[0, 3, 1], globalScaling=2)
+            self.obstacle_cube_mjcf1 = self._p.loadURDF(filename, basePosition=[0, 4, 1], globalScaling=2)
             self.obstacle_cube_mjcf2 = self._p.loadURDF(filename, basePosition=[0, -4, 1], globalScaling=2)
             self.obstacle_cube_mjcf3 = self._p.loadURDF(filename, basePosition=[4, 0, 1], globalScaling=2)
             self.obstacle_cube_mjcf4 = self._p.loadURDF(filename, basePosition=[-4, 0, 1], globalScaling=2)
@@ -101,9 +101,9 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
 
 
         decoder_path = project_config.DECODER_PATH
-        with open("cur_path.txt", "r") as f:
-            decoder_path = f.readline()
-            decoder_path += "/autoencoders/decoder.pth"
+        #with open("cur_path.txt", "r") as f:
+        #    decoder_path = f.readline()
+        #    decoder_path += "/autoencoders/decoder.pth"
         state_dict = torch.load(decoder_path)
         #print(self.action_space.shape[0], self.observation_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE)
         self.decoder = Decoder(self.observation_space.shape[0],

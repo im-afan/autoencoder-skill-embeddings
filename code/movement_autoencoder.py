@@ -21,7 +21,7 @@ class Encoder(nn.Module):
         return x
 
 class Decoder(nn.Module):
-    def __init__(self, observation_size, action_size, latent_size, hidden_size=64):
+    def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
         #print("wanted shape: ", observation_size,latent_size)
         self.dense1 = nn.Linear(observation_size+latent_size, hidden_size) # takes in original state + embedding
