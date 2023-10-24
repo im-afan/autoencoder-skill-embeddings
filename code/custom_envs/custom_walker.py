@@ -221,10 +221,12 @@ class WalkerTargetPosBulletEnv(
             obstacle_progress = self.obstacle_potential-prev_obstacle_potential
         obstacle_progress *= 1/(1+progress)
         """
-        parts_index_list = []
-        for i in self.robot.parts:
-            parts_index_list.append(self.robot.parts[i].bodyPartIndex)
-        obstacle_penalty = self.stadium_scene.get_collision_penalty(parts_index_list)
+        obstacle_penalty = 0
+        if(self.has_obstacles):
+            parts_index_list = []
+            for i in self.robot.parts:
+                parts_index_list.append(self.robot.parts[i].bodyPartIndex)
+            obstacle_penalty = self.stadium_scene.get_collision_penalty(parts_index_list)
             
 
         debugmode = 0

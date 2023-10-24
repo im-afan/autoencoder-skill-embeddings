@@ -111,11 +111,13 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         kwargs["custom_scene"] = scene
         kwargs["use_target_pos"] = False
         WalkerTargetPosBulletEnv.__init__(self, self.robot, render, **kwargs)
-        
+
+        """ 
         try:
             state_dict = torch.load(kwargs["decoder_path"])
         except:
             state_dict = torch.load("./autoencoder_pretrained/ant/decoder.pth")
+        """
 
 
         decoder_path = project_config.DECODER_PATH
