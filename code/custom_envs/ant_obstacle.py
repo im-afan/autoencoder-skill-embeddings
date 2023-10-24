@@ -15,6 +15,8 @@ class ObstacleStadiumScene(Scene):
     stadium_halflen = 105 * 0.25  # FOOBALL_FIELD_HALFLEN
     stadium_halfwidth = 50 * 0.25  # FOOBALL_FIELD_HALFWID
     stadiumLoaded = 0
+    collision_penalty = -0.01
+    num_touching_floor = 4
 
     def episode_restart(self, bullet_client):
         self._p = bullet_client
@@ -33,7 +35,8 @@ class ObstacleStadiumScene(Scene):
             self.obstacle_cube_mjcf2 = self._p.loadURDF(filename, basePosition=[0, -4, 1], globalScaling=2)
             self.obstacle_cube_mjcf3 = self._p.loadURDF(filename, basePosition=[4, 0, 1], globalScaling=2)
             self.obstacle_cube_mjcf4 = self._p.loadURDF(filename, basePosition=[-4, 0, 1], globalScaling=2)
-            obstacle_list = [self.obstacle_cube_mjcf1, self.obstacle_cube_mjcf2, self.obstacle_cube_mjcf3, self.obstacle_cube_mjcf4]
+            self.obstacle_list = [self.obstacle_cube_mjcf1, self.obstacle_cube_mjcf2, self.obstacle_cube_mjcf3, self.obstacle_cube_mjcf4]
+
 
             # filename = os.path.join(pybullet_data.getDataPath(),"stadium_no_collision.sdf")
             # self.ground_plane_mjcf = self._p.loadSDF(filename)
@@ -43,7 +46,7 @@ class ObstacleStadiumScene(Scene):
                 self._p.changeVisualShape(i, -1, rgbaColor=[1, 1, 1, 0.8])
                 self._p.configureDebugVisualizer(pybullet.COV_ENABLE_PLANAR_REFLECTION, i)
 
-            for i in obstacle_list:
+            for i in self.obstacle_list:
                 self._p.changeDynamics(i, -1, mass=10000000)
 
 
@@ -51,6 +54,21 @@ class ObstacleStadiumScene(Scene):
             # 	for j in range(p.getNumJoints(i)):
             # 		self._p.changeDynamics(i,j,lateralFriction=0)
             # despite the name (stadium_no_collision), it DID have collision, so don't add duplicate ground
+
+    def get_collision_penalty(self, robot_parts):
+        res = -self.num_touching_floor * self.collision_penalty
+        for part in robot_parts:
+            for obstacle in self.obstacle_list:
+                contact_points = self._p.getContactPoints(part, obstacle)
+                #print(part, contact_points)
+                #print()
+                #print()
+                if(len(contact_points)):
+                    #res += len(contact_points) * self.collision_penalty
+                    res += self.collision_penalty
+        return res
+
+
 
 
 class SinglePlayerStadiumSceneObstacle(ObstacleStadiumScene):

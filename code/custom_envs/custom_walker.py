@@ -174,8 +174,9 @@ class WalkerTargetPosBulletEnv(
             self.potential = self.robot.calc_potential()
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = abs(pos_x)**1.25 + abs(pos_y)**1.25
-            diff = diff ** 1/1.25
+            #dist = abs(pos_x)**1.25 + abs(pos_y)**1.25
+            #diff = diff ** 1/1.25
+            dist = sqrt(pos_x**2 + pos_y**2)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
@@ -206,6 +207,7 @@ class WalkerTargetPosBulletEnv(
             self.joints_at_limit_cost * self.robot.joints_at_limit
         )
 
+        """
         prev_obstacle_potential = self.obstacle_potential
         obstacle_progress = 0
         if(self.has_obstacles):
@@ -218,6 +220,11 @@ class WalkerTargetPosBulletEnv(
             self.obstacle_potential = min_dist/self.scene.dt
             obstacle_progress = self.obstacle_potential-prev_obstacle_potential
         obstacle_progress *= 1/(1+progress)
+        """
+        parts_index_list = []
+        for i in self.robot.parts:
+            parts_index_list.append(self.robot.parts[i].bodyPartIndex)
+        obstacle_penalty = self.stadium_scene.get_collision_penalty(parts_index_list)
             
 
         debugmode = 0
@@ -232,8 +239,8 @@ class WalkerTargetPosBulletEnv(
             print(joints_at_limit_cost)
             print("feet_collision_cost")
             print(feet_collision_cost)
-            print("obstacle_cost")
-            print(obstacle_progress)
+            print("obstacle penalty") 
+            print(obstacle_penalty)
             time.sleep(0.01)
 
         self.rewards = [
@@ -242,6 +249,7 @@ class WalkerTargetPosBulletEnv(
             electricity_cost,
             joints_at_limit_cost,
             feet_collision_cost,
+            obstacle_penalty
             #obstacle_progress,
         ]
         if debugmode:
