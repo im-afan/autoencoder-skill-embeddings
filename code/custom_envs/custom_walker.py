@@ -61,7 +61,7 @@ class WalkerTargetPosBulletEnv(
         if(self.logging):
             self.max_ep_length = 150
 
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode)
+        MJCFBaseBulletEnv.__init__(self, robot, render)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
