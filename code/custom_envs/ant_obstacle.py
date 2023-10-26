@@ -15,7 +15,7 @@ class ObstacleStadiumScene(Scene):
     stadium_halflen = 105 * 0.25  # FOOBALL_FIELD_HALFLEN
     stadium_halfwidth = 50 * 0.25  # FOOBALL_FIELD_HALFWID
     stadiumLoaded = 0
-    collision_penalty = -0.01
+    collision_penalty = -0.015
     num_touching_floor = 4
 
     def episode_restart(self, bullet_client):

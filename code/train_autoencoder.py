@@ -88,7 +88,7 @@ class AutoencoderWrapper:
             print("--------------------------SAVING MODEL-------------------------")
             print("saving encoder model at: " + self.checkpoint_path + "encoder.pth")
             print("saving decoder model at: " + self.checkpoint_path + "decoder.pth")
-            self.autoencoder.save(self.checkpoint_path)
+            #self.autoencoder.save(self.checkpoint_path)
             print("save successful")
             print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
             print("---------------------------------------------------------------")
@@ -107,4 +107,6 @@ if __name__ == '__main__':
     except:
         logged_states_path = "./logged_states/anttargetpos/"
     autoencoder_trainer = AutoencoderWrapper(AntTargetPosLowLevel(), checkpoint_path=checkpoint_path, logged_states_path=logged_states_path)
+    #autoencoder_trainer.autoencoder.decoder.load_state_dict(torch.load(checkpoint_path + "decoder.pth"))
+    #autoencoder_trainer.autoencoder.encoder.load_state_dict(torch.load(checkpoint_path + "encoder.pth"))
     autoencoder_trainer.train()
