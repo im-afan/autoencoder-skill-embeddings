@@ -74,7 +74,7 @@ class AutoencoderWrapper:
                 #print("index: {}, orig: {}, end: {}".format(batch_index, begin_state.shape, end_state.shape))
                 optimizer.zero_grad()
 
-                output = self.autoencoder(begin_state, action)
+                output = self.autoencoder(action)
 
                 loss = loss_fn(output, action)
                 loss.backward()
@@ -88,7 +88,7 @@ class AutoencoderWrapper:
             print("--------------------------SAVING MODEL-------------------------")
             print("saving encoder model at: " + self.checkpoint_path + "encoder.pth")
             print("saving decoder model at: " + self.checkpoint_path + "decoder.pth")
-            #self.autoencoder.save(self.checkpoint_path)
+            self.autoencoder.save(self.checkpoint_path)
             print("save successful")
             print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
             print("---------------------------------------------------------------")

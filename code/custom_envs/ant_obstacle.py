@@ -143,7 +143,7 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         state = torch.tensor(self.robot.calc_state())
         latent = torch.tensor(a)
         #print("a shape: ", a.shape)
-        action = self.decoder(state, latent).detach().numpy()
+        action = self.decoder(latent).detach().numpy()
         #action = np.ones_like(action) / 3
         #print(action)
         return super().step(action)

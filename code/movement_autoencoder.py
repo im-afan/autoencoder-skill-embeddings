@@ -5,35 +5,37 @@ import numpy as np
 class Encoder(nn.Module):
     def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
-        self.dense1 = nn.Linear(observation_size+action_size, hidden_size)
+        self.dense1 = nn.Linear(action_size, hidden_size)
         self.dense2 = nn.Linear(hidden_size, hidden_size)
         self.dense3 = nn.Linear(hidden_size, latent_size)
         
-    def forward(self, state_orig, action):
-        x = torch.concat((state_orig, action), dim=1)
+    def forward(self, action):
+        #x = torch.concat((state_orig, action), dim=1)
         #print(x.shape, self.dense1.in_features)
+        x = action
         x = self.dense1(x);
         x = nn.ReLU()(x)
         x = self.dense2(x);
         x = nn.ReLU()(x)
         x = self.dense3(x);
-        x = nn.Sigmoid()(x)
+        x = nn.ReLU()(x)
         return x
 
 class Decoder(nn.Module):
     def __init__(self, observation_size, action_size, latent_size, hidden_size=32):
         super().__init__()
         #print("wanted shape: ", observation_size,latent_size)
-        self.dense1 = nn.Linear(observation_size+latent_size, hidden_size) # takes in original state + embedding
+        self.dense1 = nn.Linear(latent_size, hidden_size) # takes in original state + embedding
         self.dense2 = nn.Linear(hidden_size, hidden_size)
         self.dense3 = nn.Linear(hidden_size, action_size)
 
-    def forward(self, state_orig, latent_encoding):
+    def forward(self, latent_encoding):
         #print(state_orig.shape, latent_encoding.shape)
-        if(len(state_orig.shape) == 2):
+        """if(len(state_orig.shape) == 2):
             x = torch.concat((state_orig, latent_encoding), dim=1)
         else:
-            x = torch.concat((state_orig, latent_encoding), dim=0)
+            x = torch.concat((state_orig, latent_encoding), dim=0)"""
+        x = latent_encoding
         x = self.dense1(x)
         x = nn.ReLU()(x)
         x = self.dense2(x)
@@ -52,6 +54,6 @@ class Autoencoder(nn.Module):
         torch.save(self.encoder.state_dict(), checkpoint_path + "encoder.pth")
         torch.save(self.decoder.state_dict(), checkpoint_path + "decoder.pth")
 
-    def forward(self, state_orig, action):
-        latent = self.encoder(state_orig, action)
-        return self.decoder(state_orig, latent)
+    def forward(self, action):
+        latent = self.encoder(action)
+        return self.decoder(latent)
