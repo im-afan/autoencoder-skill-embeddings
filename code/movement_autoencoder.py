@@ -17,7 +17,7 @@ class Encoder(nn.Module):
         x = self.dense2(x);
         x = nn.ReLU()(x)
         x = self.dense3(x);
-        x = nn.Sigmoid()(x)
+        #x = nn.Sigmoid()(x)
         return x
 
 class Decoder(nn.Module):

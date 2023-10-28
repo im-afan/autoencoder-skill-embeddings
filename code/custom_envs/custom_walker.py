@@ -188,8 +188,8 @@ class WalkerTargetPosBulletEnv(
             dist = sqrt(pos_x**2 + pos_y**2)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
 
-            reward_dist = sqrt((10-pos_x)**2 + (0-pos_y)**2)
-            if(reward_dist < 1):
+            #reward_dist = sqrt((10-pos_x)**2 + (0-pos_y)**2)
+            if(dist > 5):
                 if(not self.reached_target):
                     reach_target_bonus = 1000
                 self.reached_target = True
