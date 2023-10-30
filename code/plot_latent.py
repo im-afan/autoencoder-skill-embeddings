@@ -53,6 +53,6 @@ for batch_index, (begin_state, end_state, action) in enumerate(loader):
         z.append(output[i][2])
     print(batch_index)
 
-markers = go.Scatter3d(x=x, y=y, z=z, marker=go.scatter3d.Marker(size=3), opacity=0.8, mode='markers')
+markers = go.Scatter3d(x=x, y=y, z=z, marker=go.scatter3d.Marker(size=1), opacity=0.5, mode='markers')
 fig = go.Figure(data=markers)
 fig.show()

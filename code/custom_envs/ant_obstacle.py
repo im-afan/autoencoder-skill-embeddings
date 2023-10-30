@@ -132,8 +132,8 @@ class AntObstacleHighLevelEnv(WalkerTargetPosBulletEnv):
         self.decoder.load_state_dict(state_dict)
 
         self.action_space = Box(
-            np.full((project_config.AUTOENCODER_LATENT_SIZE_ANT), -10), 
-            np.full((project_config.AUTOENCODER_LATENT_SIZE_ANT), 10)
+            np.full((project_config.AUTOENCODER_LATENT_SIZE_ANT), -1), 
+            np.full((project_config.AUTOENCODER_LATENT_SIZE_ANT), 1)
         )
 
         #print(self.action_space)
