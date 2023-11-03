@@ -78,7 +78,7 @@ class WalkerTargetPosBulletEnv(
         self.reached_target = False
 
         self.cur_time = 0
-        angle = np.random.uniform(0, np.pi)
+        angle = np.random.uniform(0, 0)
         target_dist = self.target_dist
         if(self.use_target_velocity):
             self.target_dist = np.random.uniform(self.min_target_dist, self.max_target_dist)
@@ -246,7 +246,7 @@ class WalkerTargetPosBulletEnv(
         #reward for getting to target
             
 
-        debugmode = 0
+        debugmode = 1
         if debugmode:
             print("alive=")
             print(self._alive)
