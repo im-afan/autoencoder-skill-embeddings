@@ -1,5 +1,7 @@
 import sys
 
+from register_envs import register_envs
+
 import project_config
 import logger
 from custom_envs.ant_turn_pybullet import AntTargetPosLowLevel
@@ -58,7 +60,12 @@ class AutoencoderWrapper:
                 logger.log_state(logged_orig_states[i], logged_end_states[i], logged_actions[i], 0)
             self.dataset = MovementDataset(logger.logged_states)
 
-        state_dim = env.observation_space.shape[0]
+        print(env.observation_space)
+        if(type(env.observation_space) == gym.spaces.Box):
+            state_dim = env.observation_space.shape[0]
+        else:
+            state_dim = env.observation_space["observation"].shape[0] - 2 # subtract the cur time and wanted finger state
+        print(state_dim)
         action_dim = env.action_space.shape[0]
         self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_ANT)
     
@@ -106,7 +113,10 @@ if __name__ == '__main__':
         logged_states_path = sys.argv[2]
     except:
         logged_states_path = "./logged_states/anttargetpos/"
-    autoencoder_trainer = AutoencoderWrapper(AntTargetPosLowLevel(), checkpoint_path=checkpoint_path, logged_states_path=logged_states_path)
+
+    register_envs()
+    env = gym.make("ReachWithGripperLowLevel-v0") #no task-specific observations
+    autoencoder_trainer = AutoencoderWrapper(env, checkpoint_path=checkpoint_path, logged_states_path=logged_states_path)
     #autoencoder_trainer.autoencoder.decoder.load_state_dict(torch.load(checkpoint_path + "decoder.pth"))
     #autoencoder_trainer.autoencoder.encoder.load_state_dict(torch.load(checkpoint_path + "encoder.pth"))
     autoencoder_trainer.train()

@@ -11,8 +11,11 @@ from panda_gym.envs.tasks.reach import Reach
 from panda_gym.envs.tasks.slide import Slide
 from panda_gym.envs.tasks.stack import Stack
 from panda_gym.pybullet import PyBullet
+
 import custom_envs.pick_and_place_3dgoal
 from custom_envs.custom_reach import ReachWithGripper
+
+import logger
 
 class ReachWithGripperLowLevel(RobotTaskEnv):
     """Reach task wih Panda robot.
@@ -52,11 +55,12 @@ class ReachWithGripperLowLevel(RobotTaskEnv):
     ) -> None:
         #print("aklsdjfhalksdjhfladksjfhaklsdhf")
         sim = PyBullet(render_mode=render_mode, renderer=renderer)
-        robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
-        task = ReachWithGripper(sim, reward_type=reward_type, get_ee_position=robot.get_ee_position, get_fingers_width=robot.get_fingers_width)
+        self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
+        self.task = ReachWithGripper(sim, reward_type=reward_type, get_ee_position=self.robot.get_ee_position, get_fingers_width=self.robot.get_fingers_width)
+        self.logging = logging
         super().__init__(
-            robot,
-            task,
+            self.robot,
+            self.task,
             render_width=render_width,
             render_height=render_height,
             render_target_position=render_target_position,
@@ -65,6 +69,15 @@ class ReachWithGripperLowLevel(RobotTaskEnv):
             render_pitch=render_pitch,
             render_roll=render_roll,
         )
+    
+    def step(self, action):
+        orig_state = self.robot.get_obs()
+        ret = super().step(action)
+        new_state = self.robot.get_obs()
+        if(self.logging):
+            print(orig_state, new_state, action, self.task.cur_time)
+            logger.log_state(orig_state, new_state, action, self.task.cur_time)
+        return ret
 
 
 class PickAndPlaceLowLevel(RobotTaskEnv):

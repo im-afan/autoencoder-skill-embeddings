@@ -6,6 +6,8 @@ from panda_gym.envs.core import Task
 from panda_gym.utils import distance
 import time
 
+import logger
+
 class ReachWithGripper(Task):
     #basic reach task but with retracting/extending the gripper
     def __init__(
@@ -69,7 +71,7 @@ class ReachWithGripper(Task):
         return np.array(d < self.distance_threshold, dtype=bool)
 
     def compute_reward(self, achieved_goal, desired_goal, info: Dict[str, Any]) -> np.ndarray:
-        time.sleep(0.1)
+        #time.sleep(0.1)
         self.cur_time += 1
         #print(achieved_goal, desired_goal)
         if(self.cur_time >= self.finger_retract_time):
