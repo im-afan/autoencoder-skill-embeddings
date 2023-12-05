@@ -118,3 +118,38 @@ ReachWithGripperLowLevel-v0:
                        activation_fn=nn.ReLU,
                        net_arch=dict(pi=[256, 256], vf=[256, 256])
                        )"
+
+
+#Tuned THIS IS CUSTOM 
+ReachWithGripperHighLevel-v0:
+  <<: *pybullet-defaults
+  policy: "MultiInputPolicy"
+  learning_rate: !!float 3e-5
+  policy_kwargs: "dict(log_std_init=-1,
+                       ortho_init=False,
+                       activation_fn=nn.ReLU,
+                       net_arch=dict(pi=[256, 256], vf=[256, 256])
+                       )"
+
+
+#Tuned THIS IS CUSTOM 
+PickUpLowLevel-v0:
+  <<: *pybullet-defaults
+  policy: "MultiInputPolicy"
+  learning_rate: !!float 3e-5
+  policy_kwargs: "dict(log_std_init=-1,
+                       ortho_init=False,
+                       activation_fn=nn.ReLU,
+                       net_arch=dict(pi=[256, 256], vf=[256, 256])
+                       )"
+
+#Tuned THIS IS CUSTOM 
+PickUpHighLevel-v0:
+  <<: *pybullet-defaults
+  policy: "MultiInputPolicy"
+  learning_rate: !!float 3e-5
+  policy_kwargs: "dict(log_std_init=-1,
+                       ortho_init=False,
+                       activation_fn=nn.ReLU,
+                       net_arch=dict(pi=[256, 256], vf=[256, 256])
+                       )"

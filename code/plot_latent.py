@@ -7,6 +7,11 @@ from torch.utils.data import DataLoader, Dataset
 import logger
 import project_config
 import plotly.graph_objects as go
+import gymnasium as gym
+from register_envs import register_envs
+from torchinfo import summary
+
+register_envs()
 
 class MovementDataset(Dataset):
     def __init__(self, data, transform=None, checkpoint_path="Autoencoder_pretrained/"):
@@ -23,12 +28,20 @@ class MovementDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
-encoder = Encoder(0, 36, project_config.AUTOENCODER_LATENT_SIZE_ANT)
+env = gym.make("ReachWithGripperLowLevel-v0")
+obs_dim = env.robot.get_obs().shape[0]
+action_dim = env.action_space.shape[0]
+
+print(obs_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+
+encoder = Encoder(obs_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+summary(encoder, [(1,7), (1,8)])
 encoder.load_state_dict(torch.load("trials/0/autoencoders/encoder.pth"))
+
 
 running_loss = 0
 
-logged_states_path = "./trials/0/logged_states/anttargetpos/"
+logged_states_path = "./trials/0/logged_states/reachwithgripper/"
 logged_orig_states = np.load(logged_states_path+"logged_orig_states.npy")
 logged_end_states = np.load(logged_states_path+"logged_end_states.npy")
 logged_actions = np.load(logged_states_path+"logged_actions.npy")
@@ -53,6 +66,6 @@ for batch_index, (begin_state, end_state, action) in enumerate(loader):
         z.append(output[i][2])
     print(batch_index)
 
-markers = go.Scatter3d(x=x, y=y, z=z, marker=go.scatter3d.Marker(size=1), opacity=0.5, mode='markers')
+markers = go.Scatter3d(x=x, y=y, z=z, marker=go.scatter3d.Marker(size=3), opacity=0.5, mode='markers')
 fig = go.Figure(data=markers)
 fig.show()

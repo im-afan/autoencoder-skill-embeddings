@@ -64,12 +64,12 @@ class AutoencoderWrapper:
         if(type(env.observation_space) == gym.spaces.Box):
             state_dim = env.observation_space.shape[0]
         else:
-            state_dim = env.observation_space["observation"].shape[0] - 2 # subtract the cur time and wanted finger state
+            state_dim = 7 # subtract the cur time and wanted finger state
         print(state_dim)
         action_dim = env.action_space.shape[0]
-        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_ANT)
+        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
     
-    def train(self, epochs=50):
+    def train(self, epochs=20):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
         loss_fn = nn.MSELoss()
         running_loss = 0
@@ -104,6 +104,7 @@ class AutoencoderWrapper:
         pass
 
 if __name__ == '__main__':
+    task = sys.argv[0]
     try:
         checkpoint_path = sys.argv[1]
     except:

@@ -22,7 +22,7 @@ policy_kwargs = dict(log_std_init=-2,
                     net_arch=dict(pi=[256, 256], vf=[256, 256])
                     )
 
-AUTOENCODER_LATENT_SIZE_PANDA = 3
+AUTOENCODER_LATENT_SIZE_PANDA = 4
 AUTOENCODER_LATENT_SIZE_ANT = 3
 AUTOENCODER_LATENT_SIZE_HUMANOID = 4
 ENV_NAME = "Ant"

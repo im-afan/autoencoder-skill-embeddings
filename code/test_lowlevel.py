@@ -12,7 +12,7 @@ wanted_env = sys.argv[1]
 folder = sys.argv[2]
 sys.argv.pop(1)
 sys.argv.pop(1)
-sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "-n", "10000", "--folder", folder+"/agents/"]
+sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"LowLevel-v0", "-n", "40000", "--folder", folder+"/agents/"]
 
 enjoy()
 write_logs_to_file(log_path=folder+"/logged_states/"+wanted_env.lower())

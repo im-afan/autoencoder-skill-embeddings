@@ -17,6 +17,7 @@ class PickAndPlace3dGoalLowLevel(Task):
     def __init__(
         self,
         sim: PyBullet,
+        get_ee_position,
         reward_type: str = "sparse",
         distance_threshold: float = 0.05,
         goal_xy_range: float = 0.3,
@@ -27,6 +28,7 @@ class PickAndPlace3dGoalLowLevel(Task):
         self.reward_type = reward_type
         self.distance_threshold = distance_threshold
         self.object_size = 0.04
+        self.get_ee_position = get_ee_position
         self.goal_range_low = np.array([-goal_xy_range / 2, -goal_xy_range / 2, 0])
         self.goal_range_high = np.array([goal_xy_range / 2, goal_xy_range / 2, goal_z_range])
         self.obj_range_low = np.array([-obj_xy_range / 2, -obj_xy_range / 2, 0])
@@ -71,7 +73,7 @@ class PickAndPlace3dGoalLowLevel(Task):
         #print("reset asdkfjhaslkdfjhalksdfjhasdf")
         self.goal = self._sample_goal()
         object_position = self._sample_object()
-        print(object_position)
+        #print(object_position)
         self.sim.set_base_pose("target", self.goal, np.array([0.0, 0.0, 0.0, 1.0]))
         self.sim.set_base_pose("object", object_position, np.array([0.0, 0.0, 0.0, 1.0]))
 
@@ -97,47 +99,16 @@ class PickAndPlace3dGoalLowLevel(Task):
 
     def compute_reward(self, achieved_goal, desired_goal, info: Dict[str, Any]) -> np.ndarray:
         d = distance(achieved_goal, desired_goal)
+        grip_bonus = 0 
+        if(achieved_goal[2] > self.object_size/2+0.01): #uhh idk if this is actually the y pos 
+            grip_bonus = 10 
+
         if self.reward_type == "sparse":
             return -np.array(d > self.distance_threshold, dtype=np.float32)
         else:
-            return -d.astype(np.float32)
-        
-class PickAndPlaceHighLevel(PickAndPlace):
-    def __init__(
-        self,
-        sim: PyBullet,
-        reward_type: str = "sparse",
-        distance_threshold: float = 0.05,
-        goal_xy_range: float = 0.3,
-        goal_z_range: float = 0.2,
-        obj_xy_range: float = 0.3,
-    ) -> None:
-        super().__init__(
-            sim,
-            reward_type,
-            distance_threshold,
-            goal_xy_range,
-            goal_z_range,
-            obj_xy_range
-        ) 
-        decoder_path = project_config.DECODER_PATH
-        with open("cur_path.txt", "r") as f:
-            decoder_path = f.readline()
-            decoder_path += "/autoencoders/decoder.pth"
-        state_dict = torch.load(decoder_path)
-        self.decoder = Decoder(self.observation_space.shape[0],
-                               self.action_space.shape[0], 
-                               project_config.AUTOENCODER_LATENT_SIZE_PANDA)
-        self.decoder.load_state_dict(state_dict)
-
-        self.action_space = Box(
-            np.full((project_config.AUTOENCODER_LATENT_SIZE_PANDA), -1), 
-            np.full((project_config.AUTOENCODER_LATENT_SIZE_PANDA), 1)
-        )
-    
-    def step(self, a):
-        state = torch.tensor(self.robot.calc_state())
-        latent = torch.tensor(a)
-        action = self.decoder(state, latent).detach().numpy()
-        return super().step(action)
- 
+            #print("here asdfajsdhfakldjhf")
+            return grip_bonus - distance(achieved_goal, self.get_ee_position())# - d.astype(np.float32)
+            if(not grip_bonus):
+                return -distance(achieved_goal, self.get_ee_position())
+            else: 
+                return 10 - d.astype(np.float32)# - distance(achieved_goal, self.get_ee_position())

@@ -2,6 +2,8 @@ from typing import Optional
 
 import numpy as np
 
+from gymnasium.spaces import Box
+
 from panda_gym.envs.core import RobotTaskEnv
 from panda_gym.envs.robots.panda import Panda
 from panda_gym.envs.tasks.flip import Flip
@@ -13,30 +15,17 @@ from panda_gym.envs.tasks.stack import Stack
 from panda_gym.pybullet import PyBullet
 
 import custom_envs.pick_and_place_3dgoal
+import custom_envs.pick
 from custom_envs.custom_reach import ReachWithGripper
+from movement_autoencoder import Decoder
+import project_config
+
+import torch
 
 import logger
+import time
 
 class ReachWithGripperLowLevel(RobotTaskEnv):
-    """Reach task wih Panda robot.
-
-    Args:
-        render_mode (str, optional): Render mode. Defaults to "rgb_array".
-        reward_type (str, optional): "sparse" or "dense". Defaults to "sparse".
-        control_type (str, optional): "ee" to control end-effector position or "joints" to control joint values.
-            Defaults to "ee".
-        renderer (str, optional): Renderer, either "Tiny" or OpenGL". Defaults to "Tiny" if render mode is "human"
-            and "OpenGL" if render mode is "rgb_array". Only "OpenGL" is available for human render mode.
-        render_width (int, optional): Image width. Defaults to 720.
-        render_height (int, optional): Image height. Defaults to 480.
-        render_target_position (np.ndarray, optional): Camera targetting this postion, as (x, y, z).
-            Defaults to [0., 0., 0.].
-        render_distance (float, optional): Distance of the camera. Defaults to 1.4.
-        render_yaw (float, optional): Yaw of the camera. Defaults to 45.
-        render_pitch (float, optional): Pitch of the camera. Defaults to -30.
-        render_roll (int, optional): Rool of the camera. Defaults to 0.
-    """
-
     def __init__(
         self,
         render_mode: str = "rgb_array",
@@ -79,6 +68,73 @@ class ReachWithGripperLowLevel(RobotTaskEnv):
             logger.log_state(orig_state, new_state, action, self.task.cur_time)
         return ret
 
+class ReachWithGripperHighLevel(RobotTaskEnv):
+    def __init__(
+        self,
+        render_mode: str = "rgb_array",
+        reward_type: str = "dense",
+        control_type: str = "joint",
+        renderer: str = "Tiny",
+        render_width: int = 720,
+        render_height: int = 480,
+        render_target_position: Optional[np.ndarray] = None,
+        render_distance: float = 1.4,
+        render_yaw: float = 45,
+        render_pitch: float = -30,
+        render_roll: float = 0,
+        logging: bool = False,
+        render: bool = False
+    ) -> None:
+        sim = PyBullet(render_mode=render_mode, renderer=renderer)
+        self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
+        self.task = ReachWithGripper(sim, reward_type=reward_type, get_ee_position=self.robot.get_ee_position, get_fingers_width=self.robot.get_fingers_width)
+        self.logging = logging
+
+        #print("action space shape: ", self.robot.action_space.shape[0])
+        #print("observation space shape: ", self.robot.get_obs().shape[0])
+        #print()
+        #print() 
+
+        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        decoder_path = project_config.DECODER_PATH
+        with open("cur_path.txt", "r") as f:
+            decoder_path = f.readline()
+            decoder_path += "/autoencoders/decoder.pth"
+        self.decoder.load_state_dict(torch.load(decoder_path))
+        self.decoder = self.decoder.double()
+
+        super().__init__(
+            self.robot,
+            self.task,
+            render_width=render_width,
+            render_height=render_height,
+            render_target_position=render_target_position,
+            render_distance=render_distance,
+            render_yaw=render_yaw,
+            render_pitch=render_pitch,
+            render_roll=render_roll,
+        )
+
+        self.action_space = Box(
+            -np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA)),
+            np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA))
+        )
+    
+    def step(self, a):
+        #print(a)
+        #time.sleep(0.01)
+        a = torch.tensor(a)
+        orig_state = self.robot.get_obs()
+        action = self.decoder(torch.tensor(orig_state), a).detach().numpy()
+        #print(action)
+        ret = super().step(action)
+        new_state = self.robot.get_obs()
+        if(self.logging):
+            print(orig_state, new_state, action, self.task.cur_time)
+            logger.log_state(orig_state, new_state, action, self.task.cur_time)
+        return ret
+
+
 
 class PickAndPlaceLowLevel(RobotTaskEnv):
     #copied from github, need to change default settings
@@ -115,7 +171,7 @@ class PickAndPlaceHighLevel(RobotTaskEnv):
     def __init__(
         self,
         render_mode: str = "rgb_array",
-        reward_type: str = "sparse",
+        reward_type: str = "dense",
         control_type: str = "joint",
         renderer: str = "Tiny",
         render_width: int = 720,
@@ -125,14 +181,25 @@ class PickAndPlaceHighLevel(RobotTaskEnv):
         render_yaw: float = 45,
         render_pitch: float = -30,
         render_roll: float = 0,
+        logging: bool = False,
+        render: bool = False
     ) -> None:
-        #print("render mode asdfkadf", render_mode)
         sim = PyBullet(render_mode=render_mode, renderer=renderer)
-        robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
-        task = custom_envs.pick_and_place_3dgoal.PickAndPlaceHighLevel(sim, reward_type=reward_type)
+        self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
+        self.task = custom_envs.pick_and_place_3dgoal.PickAndPlace3dGoalLowLevel(sim, get_ee_position=self.robot.get_ee_position, reward_type=reward_type)
+        self.logging = logging
+
+        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        decoder_path = project_config.DECODER_PATH
+        with open("cur_path.txt", "r") as f:
+            decoder_path = f.readline()
+            decoder_path += "/autoencoders/decoder.pth"
+        self.decoder.load_state_dict(torch.load(decoder_path))
+        self.decoder = self.decoder.double()
+
         super().__init__(
-            robot,
-            task,
+            self.robot,
+            self.task,
             render_width=render_width,
             render_height=render_height,
             render_target_position=render_target_position,
@@ -141,3 +208,118 @@ class PickAndPlaceHighLevel(RobotTaskEnv):
             render_pitch=render_pitch,
             render_roll=render_roll,
         )
+
+        self.action_space = Box(
+            -np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA)),
+            np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA))
+        )
+    
+    def step(self, a):
+        #print(a)
+        #time.sleep(0.01)
+        a = torch.tensor(a)
+        orig_state = self.robot.get_obs()
+        action = self.decoder(torch.tensor(orig_state), a).detach().numpy()
+        #print(action)
+        ret = super().step(action)
+        new_state = self.robot.get_obs()
+        #if(self.logging):
+        #    print(orig_state, new_state, action, self.task.cur_time)
+        #    logger.log_state(orig_state, new_state, action, self.task.cur_time)
+        return ret
+
+class PickUpLowLevel(RobotTaskEnv):
+    #copied from github, need to change default settings
+    def __init__(
+        self,
+        render_mode: str = "rgb_array",
+        reward_type: str = "dense",
+        control_type: str = "joint",
+        renderer: str = "Tiny",
+        render_width: int = 720,
+        render_height: int = 480,
+        render_target_position: Optional[np.ndarray] = None,
+        render_distance: float = 1.4,
+        render_yaw: float = 45,
+        render_pitch: float = -30,
+        render_roll: float = 0,
+        logging: bool = False,
+        render: bool = False,
+    ) -> None:
+        sim = PyBullet(render_mode=render_mode, renderer=renderer)
+        self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
+        self.task = custom_envs.pick.PickUp(sim, get_ee_position=self.robot.get_ee_position, reward_type=reward_type)
+        super().__init__(
+            self.robot,
+            self.task,
+            render_width=render_width,
+            render_height=render_height,
+            render_target_position=render_target_position,
+            render_distance=render_distance,
+            render_yaw=render_yaw,
+            render_pitch=render_pitch,
+            render_roll=render_roll,
+        )
+
+
+class PickUpHighLevel(RobotTaskEnv):
+    def __init__(
+        self,
+        render_mode: str = "rgb_array",
+        reward_type: str = "dense",
+        control_type: str = "joint",
+        renderer: str = "Tiny",
+        render_width: int = 720,
+        render_height: int = 480,
+        render_target_position: Optional[np.ndarray] = None,
+        render_distance: float = 1.4,
+        render_yaw: float = 45,
+        render_pitch: float = -30,
+        render_roll: float = 0,
+        logging: bool = False,
+        render: bool = False
+    ) -> None:
+        sim = PyBullet(render_mode=render_mode, renderer=renderer)
+        self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
+        self.task = custom_envs.pick.PickUp(sim, get_ee_position=self.robot.get_ee_position, reward_type=reward_type)
+        self.logging = logging
+
+        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        decoder_path = project_config.DECODER_PATH
+        with open("cur_path.txt", "r") as f:
+            decoder_path = f.readline()
+            decoder_path += "/autoencoders/decoder.pth"
+        self.decoder.load_state_dict(torch.load(decoder_path))
+        self.decoder = self.decoder.double()
+
+        super().__init__(
+            self.robot,
+            self.task,
+            render_width=render_width,
+            render_height=render_height,
+            render_target_position=render_target_position,
+            render_distance=render_distance,
+            render_yaw=render_yaw,
+            render_pitch=render_pitch,
+            render_roll=render_roll,
+        )
+
+        self.action_space = Box(
+            -np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA)),
+            np.ones((project_config.AUTOENCODER_LATENT_SIZE_PANDA))
+        )
+    
+    def step(self, a):
+        #print(a)
+        a = torch.tensor(a)
+        orig_state = self.robot.get_obs()
+        action = self.decoder(torch.tensor(orig_state), a).detach().numpy()
+        #print(action)
+        ret = super().step(action)
+        new_state = self.robot.get_obs()
+        #if(self.logging):
+        #    print(orig_state, new_state, action, self.task.cur_time)
+        #    logger.log_state(orig_state, new_state, action, self.task.cur_time)
+        return ret
+
+

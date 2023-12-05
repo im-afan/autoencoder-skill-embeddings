@@ -8,6 +8,7 @@ class Encoder(nn.Module):
         self.dense1 = nn.Linear(observation_size+action_size, hidden_size)
         self.dense2 = nn.Linear(hidden_size, hidden_size)
         self.dense3 = nn.Linear(hidden_size, latent_size)
+        print("latent size: ", latent_size)
         
     def forward(self, state_orig, action):
         x = torch.concat((state_orig, action), dim=1)
@@ -35,12 +36,15 @@ class Decoder(nn.Module):
             x = torch.concat((state_orig, latent_encoding), dim=1)
         else:
             x = torch.concat((state_orig, latent_encoding), dim=0)
+        #x = torch.tensor(x, dtype=torch.double)
+        #print(x)
         x = self.dense1(x)
         x = nn.ReLU()(x)
         x = self.dense2(x)
         x = nn.ReLU()(x)
         x = self.dense3(x);
         #x = nn.Sigmoid()(x)
+        x = nn.Tanh()(x);
         return x
 
 class Autoencoder(nn.Module):
