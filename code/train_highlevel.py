@@ -1,4 +1,4 @@
-"""from register_envs import register_envs
+from register_envs import register_envs
 from custom_enjoy import enjoy
 from rl_zoo3.train import train
 import sys
@@ -11,8 +11,8 @@ sys.argv = sys.argv + ["--algo", "ppo", "--env", wanted_env+"HighLevel-v0", "--e
                         "--tensorboard-log", "tensorboard/"+wanted_env+"HighLevel", "-n", "2000000", "--conf-file", "ppo_config.yml", "-P"]
 
 train()
-"""
 
+"""
 import os
 import sys
 from stable_baselines3 import PPO
@@ -47,3 +47,4 @@ model = PPO(
     policy_kwargs=project_config.policy_kwargs,
     verbose=1
 )
+"""
