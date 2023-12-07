@@ -36,7 +36,7 @@ print(obs_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
 
 encoder = Encoder(obs_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
 summary(encoder, [(1,7), (1,8)])
-encoder.load_state_dict(torch.load("trials/0/autoencoders/encoder.pth"))
+encoder.load_state_dict(torch.load("tests/autoencoders/both/encoder.pth"))
 
 
 running_loss = 0

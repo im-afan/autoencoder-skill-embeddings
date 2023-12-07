@@ -17,6 +17,7 @@ import torch
 from torch.optim import Adam
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 
 import gymnasium as gym
@@ -69,12 +70,14 @@ class AutoencoderWrapper:
         action_dim = env.action_space.shape[0]
         self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
     
-    def train(self, epochs=20):
+    def train(self, epochs=50):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
         loss_fn = nn.MSELoss()
         running_loss = 0
         start_time = datetime.now()
         loader = DataLoader(self.dataset, batch_size=16)
+
+        writer = SummaryWriter(log_dir="./tensorboard/autoencoder-training2")
 
         for epoch in range(epochs):
             for batch_index, (begin_state, end_state, action) in enumerate(loader):
@@ -90,6 +93,7 @@ class AutoencoderWrapper:
                 optimizer.step()
                 if(batch_index % self.print_freq == self.print_freq-1):
                     print("epoch : {}, batch index : {}, loss : {}".format(epoch, batch_index, running_loss))
+                    writer.add_scalar("loss", running_loss, epoch*batch_index+batch_index)
                     running_loss = 0
             # save model
             print("--------------------------SAVING MODEL-------------------------")
@@ -99,6 +103,7 @@ class AutoencoderWrapper:
             print("save successful")
             print("Elapsed Time  : ", datetime.now().replace(microsecond=0) - start_time)
             print("---------------------------------------------------------------")
+        writer.close()
 
     def test(self, timesteps=1000):
         pass
