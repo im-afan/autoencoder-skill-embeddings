@@ -13,11 +13,16 @@ skill representations without complicating the high-level policy. Tests show
 that after the basic latent space has been developed, my method outperforms
 classic RL algorithms.
 
+# Autoencoder Architecture
+![image](./figs/autoencoder.onnx_vert.png.png)
+# Autoencoder latent space plot
+![image](./figs/latent_plot.png)
+
 ## Experiments
 ### Panda arm, pick & place
 [cite bullet-panda here] 
 panda-gym is a PyBullet-based set of environments revolving around the Panda robotic arm.
 I designed a custom environment where the robot has to pick up an object. The rewards are dense, where the robot receives penalty for being farther away
 from the object and adding a big reward for when the object is lifted up 0.1 m.
-~[image](./figs/results_vs_no_residual.png)
+![image](./figs/results_vs_no_residual.png)
 white = skill embeddings with residual connection in autoencoder, red = vanilla skill embeddings
