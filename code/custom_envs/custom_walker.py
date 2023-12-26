@@ -29,6 +29,7 @@ class WalkerTargetPosBulletEnv(
         self.has_obstacles = False
         self.target_velocity = 0
         self.obstacle_potential = 0
+        self.reached_target = False
 
         try:
             self.use_target_pos = kwargs["use_target_pos"]
@@ -45,6 +46,7 @@ class WalkerTargetPosBulletEnv(
 
         if("custom_scene" in kwargs):
             self.scene_class = kwargs["custom_scene"] 
+            self.target_dist = 10
             self.has_obstacles = True
 
         try:
@@ -57,7 +59,11 @@ class WalkerTargetPosBulletEnv(
         except:
             render_mode = "rgb_array"
 
-        MJCFBaseBulletEnv.__init__(self, robot, render, render_mode=render_mode)
+        self.max_ep_length = 1000
+        if(self.logging):
+            self.max_ep_length = 150 
+
+        MJCFBaseBulletEnv.__init__(self, robot, render)
         self.observation_space = self.observation_space
         self.action_space = self.action_space
 
@@ -69,6 +75,8 @@ class WalkerTargetPosBulletEnv(
         return self.stadium_scene
 
     def reset(self, **kwargs):
+        self.reached_target = False
+
         self.cur_time = 0
         angle = np.random.uniform(0, np.pi)
         target_dist = self.target_dist
@@ -119,7 +127,7 @@ class WalkerTargetPosBulletEnv(
         return r
 
     def _isDone(self):
-        return self._alive < 0 or self.cur_time >= 1000
+        return self._alive < 0 or self.cur_time >= self.max_ep_length 
 
     def move_robot(self, init_x, init_y, init_z):
         "Used by multiplayer stadium to move sideways, to another running lane."
@@ -170,12 +178,21 @@ class WalkerTargetPosBulletEnv(
             done = True
 
         potential_old = self.potential
+        reach_target_bonus = 0
         if(self.use_target_pos):
             self.potential = self.robot.calc_potential()
         else:
             pos_x, pos_y, pos_z = self.robot.body_xyz
-            dist = (abs(pos_x)**1.25 + abs(pos_y)**1.25)**(1/1.25)
+            #dist = abs(pos_x)**1.25 + abs(pos_y)**1.25
+            #diff = diff ** 1/1.25
+            dist = sqrt(pos_x**2 + pos_y**2)
             self.potential = -(self.target_dist-dist)/self.robot.scene.dt
+
+            #reward_dist = sqrt((10-pos_x)**2 + (0-pos_y)**2)
+            if(dist > 5):
+                if(not self.reached_target):
+                    reach_target_bonus = 1000
+                self.reached_target = True
             #print("dist frm origin: {}".format(dist))
         #print(self.potential, potential_old)
         if(self.use_target_velocity):
@@ -205,6 +222,7 @@ class WalkerTargetPosBulletEnv(
             self.joints_at_limit_cost * self.robot.joints_at_limit
         )
 
+        """
         prev_obstacle_potential = self.obstacle_potential
         obstacle_progress = 0
         if(self.has_obstacles):
@@ -217,6 +235,15 @@ class WalkerTargetPosBulletEnv(
             self.obstacle_potential = min_dist/self.scene.dt
             obstacle_progress = self.obstacle_potential-prev_obstacle_potential
         obstacle_progress *= 1/(1+progress)
+        """
+        obstacle_penalty = 0
+        if(self.has_obstacles):
+            parts_index_list = []
+            for i in self.robot.parts:
+                parts_index_list.append(self.robot.parts[i].bodyPartIndex)
+            obstacle_penalty = self.stadium_scene.get_collision_penalty(parts_index_list)
+
+        #reward for getting to target
             
 
         debugmode = 0
@@ -231,8 +258,10 @@ class WalkerTargetPosBulletEnv(
             print(joints_at_limit_cost)
             print("feet_collision_cost")
             print(feet_collision_cost)
-            print("obstacle_cost")
-            print(obstacle_progress)
+            print("obstacle penalty") 
+            print(obstacle_penalty)
+            print("reach target bonus")
+            print(reach_target_bonus)
             time.sleep(0.01)
 
         self.rewards = [
@@ -241,6 +270,8 @@ class WalkerTargetPosBulletEnv(
             electricity_cost,
             joints_at_limit_cost,
             feet_collision_cost,
+            obstacle_penalty,
+            reach_target_bonus
             #obstacle_progress,
         ]
         if debugmode:
