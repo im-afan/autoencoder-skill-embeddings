@@ -1,5 +1,0 @@
-- probably something on reinforcement learning
-- something similar to nvidia ASE? 
-- ase without the gan part? 
-    - first small tasks such as walking towards target -> latent space -> general task
-- fully unsupervised skill embeddings 

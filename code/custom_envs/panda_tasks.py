@@ -83,7 +83,9 @@ class ReachWithGripperHighLevel(RobotTaskEnv):
         render_pitch: float = -30,
         render_roll: float = 0,
         logging: bool = False,
-        render: bool = False
+        render: bool = False,
+        in_embed_state: bool = True,
+        latent_embed_state: bool = True,
     ) -> None:
         sim = PyBullet(render_mode=render_mode, renderer=renderer)
         self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
@@ -95,11 +97,13 @@ class ReachWithGripperHighLevel(RobotTaskEnv):
         #print()
         #print() 
 
-        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        subpath = str(int(in_embed_state)) + str(int(latent_embed_state)) 
+
+        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA, embed_state=latent_embed_state)
         decoder_path = project_config.DECODER_PATH
         with open("cur_path.txt", "r") as f:
             decoder_path = f.readline()
-            decoder_path += "/autoencoders/decoder.pth"
+            decoder_path += "/autoencoders/" + subpath + "decoder.pth"
         self.decoder.load_state_dict(torch.load(decoder_path))
         self.decoder = self.decoder.double()
 
@@ -277,20 +281,29 @@ class PickUpHighLevel(RobotTaskEnv):
         render_pitch: float = -30,
         render_roll: float = 0,
         logging: bool = False,
-        render: bool = False
+        render: bool = False,
+        in_embed_state: bool = True,
+        latent_embed_state: bool = True
     ) -> None:
         sim = PyBullet(render_mode=render_mode, renderer=renderer)
         self.robot = Panda(sim, block_gripper=False, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
         self.task = custom_envs.pick.PickUp(sim, get_ee_position=self.robot.get_ee_position, reward_type=reward_type)
         self.logging = logging
 
-        self.decoder = Decoder(self.robot.get_obs().shape[0], self.robot.action_space.shape[0], project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        #subpath = str(int(in_embed_state)) + str(int(latent_embed_state)) 
+
         decoder_path = project_config.DECODER_PATH
         with open("cur_path.txt", "r") as f:
-            decoder_path = f.readline()
-            decoder_path += "/autoencoders/decoder.pth"
+            decoder_path = f.readline()[:-1]
+            subpath = f.readline()
+            decoder_path += "/autoencoders/" + subpath + "/decoder.pth"
+        self.decoder = Decoder(self.robot.get_obs().shape[0], 
+                               self.robot.action_space.shape[0], 
+                               project_config.AUTOENCODER_LATENT_SIZE_PANDA, 
+                               embed_state=bool(int(subpath[1])-int("0")))
         self.decoder.load_state_dict(torch.load(decoder_path))
         self.decoder = self.decoder.double()
+
 
         super().__init__(
             self.robot,
@@ -311,9 +324,9 @@ class PickUpHighLevel(RobotTaskEnv):
     
     def step(self, a):
         #print(a)
-        a = torch.tensor(a)
+        a = torch.tensor(a, dtype=torch.double)
         orig_state = self.robot.get_obs()
-        action = self.decoder(torch.tensor(orig_state), a).detach().numpy()
+        action = self.decoder(torch.tensor(orig_state, dtype=torch.double), a).detach().numpy()
         #print(action)
         ret = super().step(action)
         new_state = self.robot.get_obs()

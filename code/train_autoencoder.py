@@ -48,6 +48,8 @@ class AutoencoderWrapper:
             checkpoint_path="./autoencoder_pretrained/",
             logged_states_path="./logged_states/",
             print_freq=10,
+            in_embed_state=True,
+            latent_embed_state=True,
         ):
         self.checkpoint_path = checkpoint_path
         self.print_freq = print_freq
@@ -68,16 +70,16 @@ class AutoencoderWrapper:
             state_dim = 7 # subtract the cur time and wanted finger state
         print(state_dim)
         action_dim = env.action_space.shape[0]
-        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA)
+        self.autoencoder = Autoencoder(state_dim, action_dim, project_config.AUTOENCODER_LATENT_SIZE_PANDA, in_embed_state=in_embed_state, latent_embed_state=latent_embed_state)
     
-    def train(self, epochs=50):
+    def train(self, epochs=20):
         optimizer = Adam(self.autoencoder.parameters(), lr=0.001)
         loss_fn = nn.MSELoss()
         running_loss = 0
         start_time = datetime.now()
         loader = DataLoader(self.dataset, batch_size=16)
 
-        writer = SummaryWriter(log_dir="./tensorboard/autoencoder-training2")
+        writer = SummaryWriter(log_dir="./tensorboard/" + checkpoint_path)
 
         for epoch in range(epochs):
             for batch_index, (begin_state, end_state, action) in enumerate(loader):
@@ -120,9 +122,18 @@ if __name__ == '__main__':
     except:
         logged_states_path = "./logged_states/anttargetpos/"
 
+    try:
+        subpath = sys.argv[3]
+    except:
+        subpath = "11"
+
+    in_embed_state = bool(int(subpath[0]) - int("0"))
+    latent_embed_state = bool(int(subpath[1]) - int("0"))
+
     register_envs()
     env = gym.make("ReachWithGripperLowLevel-v0") #no task-specific observations
-    autoencoder_trainer = AutoencoderWrapper(env, checkpoint_path=checkpoint_path, logged_states_path=logged_states_path)
+    checkpoint_path += "/" + subpath + "/"
+    autoencoder_trainer = AutoencoderWrapper(env, checkpoint_path=checkpoint_path, logged_states_path=logged_states_path, in_embed_state=in_embed_state, latent_embed_state=latent_embed_state)
     #autoencoder_trainer.autoencoder.decoder.load_state_dict(torch.load(checkpoint_path + "decoder.pth"))
     #autoencoder_trainer.autoencoder.encoder.load_state_dict(torch.load(checkpoint_path + "encoder.pth"))
     autoencoder_trainer.train()
