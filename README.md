@@ -1,4 +1,4 @@
-# Autoencoder-based skill embeddings with residual connections
+# Autoencoder-based skill embeddings with extra decoder information 
 ### Currently work in progress!
 ### Right now the code is very unorganized and split across a lot of different branches, will try to organize everything + do more experiments soon
 
